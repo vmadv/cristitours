@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Preview — Email encuesta Cristitours</title>
+<style>
+  body { margin: 0; padding: 2rem 1rem; background: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .label { text-align: center; font-size: 0.75rem; color: #94a3b8; margin-bottom: 1rem; letter-spacing: 0.5px; text-transform: uppercase; }
+  .star-link { text-decoration: none; display: block; cursor: pointer; }
+  .star { font-size: 2.4rem; line-height: 1; color: #d1d5db; transition: color 0.15s, transform 0.1s; display: block; }
+  .star:hover, .star.active { color: #f59e0b; transform: scale(1.15); }
+</style>
+</head>
+<body>
+
+<p class="label">Vista previa del correo de encuesta</p>
+
+<!-- EMAIL -->
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr><td align="center">
+<table style="max-width:480px;width:100%;background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.10)">
+
+  <!-- HEADER -->
+  <tr><td style="background:linear-gradient(135deg,#1a56db,#1e40af);padding:2rem 1.5rem;text-align:center">
+    <p style="margin:0;color:white;font-size:1.4rem;font-weight:700;letter-spacing:-0.3px">Cristitours</p>
+    <p style="margin:0.3rem 0 0;color:rgba(255,255,255,0.75);font-size:0.82rem">Las Palmas de Gran Canaria</p>
+  </td></tr>
+
+  <!-- BODY -->
+  <tr><td style="padding:2rem 1.5rem;text-align:center">
+    <p style="margin:0 0 0.4rem;color:#1a202c;font-size:1.1rem;font-weight:700">Hola, María</p>
+    <p style="margin:0 0 1.75rem;color:#64748b;font-size:0.9rem;line-height:1.7">
+      Gracias por unirte al <strong>Free Tour Centro Histórico</strong>.<br>
+      ¿Cómo valorarías tu experiencia de hoy?
+    </p>
+
+    <!-- ESTRELLAS -->
+    <table cellpadding="0" cellspacing="0" style="margin:0 auto">
+    <tr>
+      <td style="padding:0 6px"><a class="star-link" onclick="clickStar(1)"><span class="star" id="s1">★</span><div style="font-size:0.65rem;color:#94a3b8;margin-top:5px">1</div></a></td>
+      <td style="padding:0 6px"><a class="star-link" onclick="clickStar(2)"><span class="star" id="s2">★</span><div style="font-size:0.65rem;color:#94a3b8;margin-top:5px">2</div></a></td>
+      <td style="padding:0 6px"><a class="star-link" onclick="clickStar(3)"><span class="star" id="s3">★</span><div style="font-size:0.65rem;color:#94a3b8;margin-top:5px">3</div></a></td>
+      <td style="padding:0 6px"><a class="star-link" onclick="clickStar(4)"><span class="star" id="s4">★</span><div style="font-size:0.65rem;color:#94a3b8;margin-top:5px">4</div></a></td>
+      <td style="padding:0 6px"><a class="star-link" onclick="clickStar(5)"><span class="star" id="s5">★</span><div style="font-size:0.65rem;color:#94a3b8;margin-top:5px">5</div></a></td>
+    </tr>
+    </table>
+
+    <p style="margin:1.75rem 0 0;color:#94a3b8;font-size:0.78rem;line-height:1.6">
+      Tu opinión nos ayuda a mejorar cada día.
+    </p>
+  </td></tr>
+
+  <!-- FOOTER -->
+  <tr><td style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:1rem 1.5rem;text-align:center">
+    <p style="margin:0;color:#94a3b8;font-size:0.75rem">Cristitours · cristitours.com</p>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+
+<!-- SEPARADOR -->
+<p class="label" style="margin-top:2.5rem">Si pulsan 1–4 estrellas — página de gracias</p>
+
+<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:0.5rem">
+<tr><td align="center">
+<table style="max-width:380px;width:100%;background:white;border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.10)">
+  <tr><td style="background:linear-gradient(135deg,#1a56db,#1e40af);padding:1.25rem;text-align:center">
+    <p style="margin:0;color:white;font-size:1rem;font-weight:700">Cristitours</p>
+  </td></tr>
+  <tr><td style="padding:2.5rem 2rem;text-align:center">
+    <div style="font-size:3rem;line-height:1;margin-bottom:1rem">🙏</div>
+    <p style="margin:0 0 0.6rem;color:#1a202c;font-size:1.15rem;font-weight:700">¡Gracias, María!</p>
+    <p style="margin:0;color:#64748b;font-size:0.9rem;line-height:1.7">Gracias por tu valoración. Seguimos trabajando para ofrecerte la mejor experiencia.</p>
+    <p style="margin:2rem 0 0;font-size:0.75rem;color:#94a3b8">Cristitours · Las Palmas de Gran Canaria</p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+
+<p class="label" style="margin-top:2rem;margin-bottom:3rem">Con 5 estrellas → abre página de barra de progreso → Google Reviews</p>
+
+<script>
+let currentRating = 0;
+
+function clickStar(n) {
+  currentRating = n;
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById('s' + i).classList.toggle('active', i <= n);
+  }
+  if (n === 5) {
+    window.open('survey-5stars.html', '_blank');
+  }
+}
+
+document.querySelectorAll('.star-link').forEach((link, idx) => {
+  link.addEventListener('mouseenter', () => {
+    for (let i = 1; i <= 5; i++) {
+      document.getElementById('s' + i).style.color = i <= idx + 1 ? '#fbbf24' : '#d1d5db';
+    }
+  });
+  link.addEventListener('mouseleave', () => {
+    for (let i = 1; i <= 5; i++) {
+      const el = document.getElementById('s' + i);
+      if (!el.classList.contains('active')) el.style.color = '#d1d5db';
+    }
+  });
+});
+</script>
+
+</body>
+</html>
