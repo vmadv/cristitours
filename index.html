@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -924,6 +927,7 @@
   <button class="filter-btn" data-group="time" data-val="past" onclick="setFilter('past')">Pasadas</button>
   <span style="color:#e2e8f0;font-size:1rem;line-height:1;align-self:center">|</span>
   <button id="opiniones-btn" class="filter-btn" data-group="time" data-val="opiniones" onclick="setFilter('opiniones')" style="color:#b0bac7;font-size:0.78rem">★ Opiniones</button>
+  <button class="filter-btn" data-group="time" data-val="rendimiento" onclick="setFilter('rendimiento')" style="color:#b0bac7;font-size:0.78rem">📊 Rendimiento</button>
 </div>
 
 <div id="today-banner"></div>
@@ -1042,6 +1046,12 @@ function loadRatings() {
 // Google siempre llama a google.visualization.Query.setResponse(json)
 // Para cargar dos hojas usamos dos callbacks distintos via query param handler
 window.google = { visualization: { Query: { setResponse: function(json) {
+  // Si estamos cargando datos de Ads, redirigir al handler de Ads
+  if (window._loadingAds) {
+    window._loadingAds = false;
+    handleAdsData(json);
+    return;
+  }
   // determina qué hoja acaba de responder por el pending queue
   const tourKey = window._pendingTour;
   if (!tourKey) return;
@@ -1640,9 +1650,195 @@ function cardBorderColor(tour) {
   return '#94a3b8';
 }
 
+const ADS_SHEET_ID = '1m27_fhTFtuGlVaXJUTPCQPX5BcePEfleGUb_K2Falw8';
+const ADS_SHEET_NAME = 'Coste%20campa%C3%B1as';
+
+function renderRendimiento() {
+  document.getElementById('today-banner').innerHTML = '';
+  document.getElementById('novedades').innerHTML = '';
+  document.getElementById('app').innerHTML = `<div style="padding:1.5rem 0;text-align:center;color:#94a3b8;font-size:0.9rem">Cargando datos...</div>`;
+  loadAdsData();
+}
+
+function loadAdsData() {
+  const old = document.getElementById('ads-script');
+  if (old) old.remove();
+  const script = document.createElement('script');
+  script.id = 'ads-script';
+  script.onerror = () => {
+    window._loadingAds = false;
+    document.getElementById('app').innerHTML = `<div style="padding:2rem;text-align:center;color:#e11d48">No se pudo cargar la hoja de Ads.</div>`;
+  };
+  window._loadingAds = true;
+  script.src = `https://docs.google.com/spreadsheets/d/${ADS_SHEET_ID}/gviz/tq?tqx=out:json&sheet=${ADS_SHEET_NAME}&t=${Date.now()}`;
+  document.head.appendChild(script);
+}
+
+// Datos de Ads guardados globalmente para poder re-filtrar sin recargar
+let _adsCostByDay = {};
+let _adsBookingsByDay = {};
+let _adsAllDays = [];
+
+function handleAdsData(json) {
+  _adsCostByDay = {};
+  const rows = json.table.rows || [];
+  rows.forEach(row => {
+    const c = row.c;
+    if (!c || !c[0] || !c[0].v) return;
+    let dateStr = '';
+    const raw = c[0].v;
+    if (typeof raw === 'string' && raw.startsWith('Date(')) {
+      const parts = raw.replace('Date(','').replace(')','').split(',');
+      const y = parts[0], m = String(+parts[1]+1).padStart(2,'0'), d = String(+parts[2]).padStart(2,'0');
+      dateStr = `${y}-${m}-${d}`;
+    } else if (c[0].f) {
+      dateStr = c[0].f;
+    } else {
+      dateStr = String(raw).slice(0,10);
+    }
+    const campaign = c[2] && c[2].v ? String(c[2].v).trim() : '';
+    if (['pmax-las-palmas', 'PT_conversiones_free-tour-las-palmas'].includes(campaign)) return;
+    const cost = c[9] && c[9].v != null ? parseFloat(c[9].v) : 0;
+    _adsCostByDay[dateStr] = (_adsCostByDay[dateStr] || 0) + cost;
+  });
+
+  // Agrupar reservas por fecha de reserva (b.booked)
+  _adsBookingsByDay = {};
+  bookings.forEach(b => {
+    if (isCancelled(b) || !b.booked) return;
+    const day = b.booked.slice(0,10);
+    if (!_adsBookingsByDay[day]) _adsBookingsByDay[day] = { reservas: 0, asistentes: 0 };
+    _adsBookingsByDay[day].reservas++;
+    _adsBookingsByDay[day].asistentes += (b.people || 1);
+  });
+
+  _adsAllDays = Object.keys(_adsCostByDay).filter(d => _adsCostByDay[d] > 0).sort().reverse();
+
+  // Rango por defecto: último mes
+  const d30 = new Date(); d30.setMonth(d30.getMonth() - 1);
+  const defaultFrom = d30.toISOString().slice(0, 10);
+  const defaultTo   = new Date().toISOString().slice(0, 10);
+
+  renderRendimientoPanel(defaultFrom, defaultTo);
+}
+
+function renderRendimientoPanel(fromDate, toDate) {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const d7 = new Date(); d7.setDate(d7.getDate() - 7);
+  const cutoff7  = d7.toISOString().slice(0, 10);
+  const d30 = new Date(); d30.setMonth(d30.getMonth() - 1);
+  const cutoff30 = d30.toISOString().slice(0, 10);
+
+  // Días filtrados por el rango seleccionado
+  const filtered = _adsAllDays.filter(d => d >= fromDate && d <= toDate);
+
+  // KPIs fijos (7d y 30d, independientes del filtro)
+  function calcKpis(from, to) {
+    let cost = 0, asistentes = 0;
+    _adsAllDays.filter(d => d >= from && d <= (to || todayStr)).forEach(d => {
+      cost += _adsCostByDay[d] || 0;
+      asistentes += (_adsBookingsByDay[d]?.asistentes || 0);
+    });
+    return { cost, cpa: asistentes > 0 ? (cost / asistentes).toFixed(2) : null };
+  }
+  const kpi7  = calcKpis(cutoff7);
+  const kpi30 = calcKpis(cutoff30);
+  const fmtCpa = v => v !== null ? `${v} €` : '—';
+
+  // Totales del período filtrado
+  let totalCost = 0, totalReservas = 0, totalAsistentes = 0;
+  filtered.forEach(d => {
+    totalCost      += _adsCostByDay[d] || 0;
+    totalReservas  += _adsBookingsByDay[d]?.reservas   || 0;
+    totalAsistentes+= _adsBookingsByDay[d]?.asistentes || 0;
+  });
+  const totalCpa = totalAsistentes > 0 ? (totalCost / totalAsistentes).toFixed(2) + ' €' : '—';
+
+  // Filas de tabla
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const tableRows = filtered.length === 0
+    ? `<tr><td colspan="5" style="padding:1.5rem;text-align:center;color:#94a3b8;font-size:0.85rem">Sin datos para este período</td></tr>`
+    : filtered.map(day => {
+        const cost = _adsCostByDay[day];
+        const data = _adsBookingsByDay[day] || { reservas: 0, asistentes: 0 };
+        const { reservas, asistentes } = data;
+        const cpa = asistentes > 0 ? `${(cost / asistentes).toFixed(2)} €` : '—';
+        const [y, m, d] = day.split('-');
+        return `<tr style="border-bottom:1px solid #f8fafc">
+          <td style="padding:0.75rem 1rem;font-size:0.83rem;color:#475569;white-space:nowrap">${+d} ${meses[+m-1]} ${y}</td>
+          <td style="padding:0.75rem 1rem;font-size:0.83rem;text-align:right;color:#1a202c">${cost.toFixed(2)} €</td>
+          <td style="padding:0.75rem 1rem;font-size:0.83rem;text-align:right;color:#1a202c">${reservas || '<span style="color:#cbd5e1">0</span>'}</td>
+          <td style="padding:0.75rem 1rem;font-size:0.83rem;text-align:right;color:#1a202c">${asistentes || '<span style="color:#cbd5e1">0</span>'}</td>
+          <td style="padding:0.75rem 1rem;font-size:0.83rem;text-align:right;font-weight:${asistentes > 0 ? '700' : '400'};color:${asistentes > 0 ? '#1d4ed8' : '#cbd5e1'}">${cpa}</td>
+        </tr>`;
+      }).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div style="padding:1.25rem 0 2rem">
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.5rem">
+        <div style="background:white;border-radius:14px;padding:1rem 1.1rem;box-shadow:0 1px 6px rgba(0,0,0,0.07)">
+          <div style="font-size:0.68rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem">Gasto 7 días</div>
+          <div style="font-size:1.35rem;font-weight:800;color:#1a202c">${kpi7.cost.toFixed(2)} €</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border-radius:14px;padding:1rem 1.1rem;box-shadow:0 1px 6px rgba(0,0,0,0.07)">
+          <div style="font-size:0.68rem;color:#3b82f6;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem">€/asistente 7d</div>
+          <div style="font-size:1.35rem;font-weight:800;color:#1d4ed8">${fmtCpa(kpi7.cpa)}</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:14px;padding:1rem 1.1rem;box-shadow:0 1px 6px rgba(0,0,0,0.07)">
+          <div style="font-size:0.68rem;color:#16a34a;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem">€/asistente 30d</div>
+          <div style="font-size:1.35rem;font-weight:800;color:#15803d">${fmtCpa(kpi30.cpa)}</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;flex-wrap:wrap">
+        <span style="font-size:0.78rem;color:#64748b;font-weight:500">Filtrar por fecha:</span>
+        <input type="date" id="ads-from" value="${fromDate}" max="${toDate}"
+          style="border:1px solid #e2e8f0;border-radius:8px;padding:0.35rem 0.6rem;font-size:0.8rem;color:#1a202c;background:white;cursor:pointer"
+          onchange="applyAdsFilter()">
+        <span style="font-size:0.78rem;color:#94a3b8">→</span>
+        <input type="date" id="ads-to" value="${toDate}" min="${fromDate}"
+          style="border:1px solid #e2e8f0;border-radius:8px;padding:0.35rem 0.6rem;font-size:0.8rem;color:#1a202c;background:white;cursor:pointer"
+          onchange="applyAdsFilter()">
+      </div>
+
+      <div style="background:white;border-radius:14px;box-shadow:0 1px 6px rgba(0,0,0,0.07);overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:#f8fafc;border-bottom:2px solid #f1f5f9">
+              <th style="padding:0.75rem 1rem;font-size:0.7rem;color:#94a3b8;font-weight:700;text-align:left;text-transform:uppercase;letter-spacing:0.05em">Día</th>
+              <th style="padding:0.75rem 1rem;font-size:0.7rem;color:#94a3b8;font-weight:700;text-align:right;text-transform:uppercase;letter-spacing:0.05em">Coste campañas</th>
+              <th style="padding:0.75rem 1rem;font-size:0.7rem;color:#94a3b8;font-weight:700;text-align:right;text-transform:uppercase;letter-spacing:0.05em">Reservas</th>
+              <th style="padding:0.75rem 1rem;font-size:0.7rem;color:#94a3b8;font-weight:700;text-align:right;text-transform:uppercase;letter-spacing:0.05em">Asistentes</th>
+              <th style="padding:0.75rem 1rem;font-size:0.7rem;color:#94a3b8;font-weight:700;text-align:right;text-transform:uppercase;letter-spacing:0.05em">€/Asistente</th>
+            </tr>
+          </thead>
+          <tbody>${tableRows}</tbody>
+          ${filtered.length > 0 ? `
+          <tfoot>
+            <tr style="background:#f8fafc;border-top:2px solid #e2e8f0">
+              <td style="padding:0.75rem 1rem;font-size:0.8rem;font-weight:700;color:#1a202c">Total período</td>
+              <td style="padding:0.75rem 1rem;font-size:0.8rem;font-weight:700;color:#1a202c;text-align:right">${totalCost.toFixed(2)} €</td>
+              <td style="padding:0.75rem 1rem;font-size:0.8rem;font-weight:700;color:#1a202c;text-align:right">${totalReservas}</td>
+              <td style="padding:0.75rem 1rem;font-size:0.8rem;font-weight:700;color:#1a202c;text-align:right">${totalAsistentes}</td>
+              <td style="padding:0.75rem 1rem;font-size:0.8rem;font-weight:800;color:#1d4ed8;text-align:right">${totalCpa}</td>
+            </tr>
+          </tfoot>` : ''}
+        </table>
+      </div>
+    </div>`;
+}
+
+function applyAdsFilter() {
+  const from = document.getElementById('ads-from')?.value;
+  const to   = document.getElementById('ads-to')?.value;
+  if (from && to && from <= to) renderRendimientoPanel(from, to);
+};
+
 function render() {
   if (currentFilter === 'calendar') { renderCalendar(); return; }
   if (currentFilter === 'opiniones') { renderOpiniones(); return; }
+  if (currentFilter === 'rendimiento') { renderRendimiento(); return; }
 
   const app = document.getElementById('app');
   const banner = document.getElementById('today-banner');
