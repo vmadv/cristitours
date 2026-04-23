@@ -15,6 +15,14 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    @keyframes ldSpin { to { transform: rotate(360deg); } }
+    @keyframes ldPop  { 0%{transform:scale(0);opacity:0} 60%{transform:scale(1.3)} 100%{transform:scale(1);opacity:1} }
+    @keyframes ldBar  { from{width:0} to{width:100%} }
+    @keyframes ldRow  { from{opacity:0;transform:translateX(-12px)} to{opacity:1;transform:none} }
+    .ld-spinner { width:16px;height:16px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:ldSpin 0.7s linear infinite;flex-shrink:0 }
+    .ld-check   { width:16px;height:16px;flex-shrink:0;animation:ldPop 0.35s ease forwards }
+    .ld-row     { display:flex;align-items:center;gap:0.65rem;opacity:0;animation:ldRow 0.3s ease forwards }
+
     #auth-screen {
       display: none;
       position: fixed;
@@ -862,6 +870,33 @@
 </head>
 <body>
 
+<div id="loading-screen" style="display:flex;position:fixed;inset:0;z-index:10000;background:linear-gradient(160deg,#1a56db 0%,#1e40af 100%);flex-direction:column;align-items:center;justify-content:center;gap:2rem">
+  <div style="width:72px;height:72px;border-radius:20px;background:white;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,0.2)">
+    <img src="Cristitours.png" width="48" height="48" style="border-radius:12px;object-fit:cover" />
+  </div>
+  <div style="text-align:center">
+    <div style="color:white;font-size:1.35rem;font-weight:700;letter-spacing:-0.3px">Cristitours</div>
+    <div style="color:rgba(255,255,255,0.6);font-size:0.8rem;margin-top:0.3rem">Cargando reservas</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:0.75rem;min-width:180px">
+    <div class="ld-row" style="animation-delay:0.1s" id="ld-web">
+      <div class="ld-spinner" id="ld-web-icon"></div>
+      <span style="color:rgba(255,255,255,0.85);font-size:0.88rem;font-weight:600">Web</span>
+    </div>
+    <div class="ld-row" style="animation-delay:0.25s" id="ld-civitatis">
+      <div class="ld-spinner" id="ld-civ-icon"></div>
+      <span style="color:rgba(255,255,255,0.85);font-size:0.88rem;font-weight:600">Civitatis</span>
+    </div>
+    <div class="ld-row" style="animation-delay:0.4s" id="ld-guruwalk">
+      <div class="ld-spinner" id="ld-gw-icon"></div>
+      <span style="color:rgba(255,255,255,0.85);font-size:0.88rem;font-weight:600">Guruwalk</span>
+    </div>
+  </div>
+  <div style="width:180px;height:3px;background:rgba(255,255,255,0.15);border-radius:99px;overflow:hidden">
+    <div id="ld-bar" style="height:100%;background:rgba(255,255,255,0.7);border-radius:99px;width:0;transition:width 0.3s ease"></div>
+  </div>
+</div>
+
 <div id="auth-screen">
   <div class="auth-logo">
     <img src="Cristitours.png" width="48" height="48" style="border-radius:12px;object-fit:cover" />
@@ -903,6 +938,9 @@
       <p id="fecha-hoy"></p>
       <p id="mensaje-dia" style="font-size:0.8rem;opacity:0.85;margin-top:0.4rem;font-style:italic;animation:fadeSlide 0.8s ease both"></p>
     </div>
+    <button onclick="location.reload()" title="Actualizar" style="background:rgba(255,255,255,0.15);border:none;border-radius:12px;padding:0.5rem 0.65rem;cursor:pointer;color:white;display:flex;align-items:center;flex-shrink:0">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    </button>
     <button id="tasks-header-btn" onclick="openTasksPanel()" style="position:relative;background:rgba(255,255,255,0.15);border:none;border-radius:12px;padding:0.5rem 0.65rem;cursor:pointer;color:white;display:flex;align-items:center;gap:0.35rem;font-size:0.8rem;font-weight:600;flex-shrink:0">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       Tareas
@@ -939,6 +977,18 @@
     <div style="font-weight:700;font-size:0.95rem;color:#1a202c;margin-bottom:0.4rem">Sin teléfono válido</div>
     <div style="font-size:0.82rem;color:#64748b;margin-bottom:1.25rem;line-height:1.5">Esta reserva no tiene número de teléfono.</div>
     <button onclick="closeNoPhone()" style="width:100%;padding:0.7rem;background:#f1f5f9;color:#64748b;border:none;border-radius:10px;font-weight:600;font-size:0.88rem;cursor:pointer">Cerrar</button>
+  </div>
+</div>
+
+<div id="civitatis-contact-overlay" onclick="closeCivitatisContact(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1010;align-items:center;justify-content:center">
+  <div onclick="event.stopPropagation()" style="background:white;border-radius:16px;padding:1.5rem;max-width:300px;width:88%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
+    <div style="font-size:2rem;margin-bottom:0.6rem">🔗</div>
+    <div style="font-weight:700;font-size:0.95rem;color:#1a202c;margin-bottom:0.4rem">Abrir Civitatis</div>
+    <div id="civitatis-contact-msg" style="font-size:0.82rem;color:#64748b;margin-bottom:1.25rem;line-height:1.5"></div>
+    <div style="display:flex;gap:0.6rem">
+      <button onclick="closeCivitatisContact()" style="flex:1;padding:0.7rem;background:#f1f5f9;color:#64748b;border:none;border-radius:10px;font-weight:600;font-size:0.88rem;cursor:pointer">Cancelar</button>
+      <button id="civitatis-contact-confirm-btn" onclick="confirmCivitatisContact()" style="flex:1;padding:0.7rem;background:#1a56db;color:white;border:none;border-radius:10px;font-weight:700;font-size:0.88rem;cursor:pointer">Abrir</button>
+    </div>
   </div>
 </div>
 
@@ -1043,9 +1093,121 @@ function loadRatings() {
   document.head.appendChild(s);
 }
 
+const OTA_SHEET_ID   = '16F7BZB0rP3HWY91yTu8GH-ICEZfMZcjzzjg457lfALE';
+const OTA_SHEET_NAME = 'Reservas';
+
+function loadOTABookings() {
+  const old = document.getElementById('ota-script');
+  if (old) old.remove();
+  const script = document.createElement('script');
+  script.id = 'ota-script';
+  window._loadingOTA = true;
+  window._otaTimeout = setTimeout(() => {
+    if (window._loadingOTA) {
+      window._loadingOTA = false;
+      console.warn('OTA timeout — rendering without OTA data');
+      onDataReady(); render();
+    }
+  }, 8000);
+  script.onerror = () => {
+    clearTimeout(window._otaTimeout);
+    window._loadingOTA = false;
+    console.warn('OTA load error — rendering without OTA data');
+    onDataReady(); render();
+  };
+  script.src = `https://docs.google.com/spreadsheets/d/${OTA_SHEET_ID}/gviz/tq?tqx=out:json&sheet=${OTA_SHEET_NAME}&t=${Date.now()}`;
+  document.head.appendChild(script);
+}
+
+function parseGvizTimeOTA(cell) {
+  if (!cell || cell.v == null) return '00:00';
+  const v = cell.v;
+  if (typeof v === 'string' && v.startsWith('Date(')) {
+    const parts = v.replace('Date(','').replace(')','').split(',');
+    if (parts.length >= 5) {
+      const h = String(parseInt(parts[3])).padStart(2,'0');
+      const m = String(parseInt(parts[4])).padStart(2,'0');
+      return `${h}:${m}`;
+    }
+  }
+  const s = String(cell.f || cell.v).trim();
+  if (/^\d{1,2}:\d{2}/.test(s)) return s.slice(0,5);
+  return '00:00';
+}
+
+function parseGvizDateOTA(cell) {
+  if (!cell || cell.v == null) return '';
+  const v = cell.v;
+  if (typeof v === 'string' && v.startsWith('Date(')) {
+    const parts = v.replace('Date(','').replace(')','').split(',');
+    if (parts.length >= 3) {
+      const y = parts[0];
+      const m = String(parseInt(parts[1]) + 1).padStart(2,'0');
+      const d = String(parseInt(parts[2])).padStart(2,'0');
+      return `${y}-${m}-${d}`;
+    }
+  }
+  const s = String(cell.f || cell.v);
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
+  const dmy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (dmy) return `${dmy[3]}-${dmy[2].padStart(2,'0')}-${dmy[1].padStart(2,'0')}`;
+  return s.slice(0,10);
+}
+
+function parseOTA(json) {
+  // Columnas nueva hoja: A=Fecha procesado, B=Fuente, C=Código, D=Nombre, E=Personas,
+  //                      F=Tour, G=Fecha tour, H=Hora, I=Teléfono, J=Email, K=Estado
+  const rows = json.table.rows || [];
+  const result = [];
+  rows.forEach(row => {
+    const c = row.c;
+    if (!c) return;
+    const estado = c[10] && c[10].v ? String(c[10].v).trim() : '';
+    if (estado === 'Cancelada') return;
+    const fuenteRaw = c[1] && c[1].v ? String(c[1].v).trim().toLowerCase() : '';
+    const source = fuenteRaw.includes('civitatis') ? 'civitatis' : fuenteRaw.includes('guruwalk') ? 'guruwalk' : 'web';
+    const name    = c[3] && c[3].v ? String(c[3].v).trim() : '';
+    if (!name) return;
+    const people   = c[4] && c[4].v != null ? parseInt(c[4].v) || 1 : 1;
+    const tourRaw  = c[5] && c[5].v ? String(c[5].v).trim() : '';
+    const fechaTour = parseGvizDateOTA(c[6]);
+    if (!fechaTour) return;
+    const hora   = parseGvizTimeOTA(c[7]);
+    const phone  = c[8] && c[8].v ? String(c[8].v).trim() : '';
+    const email  = c[9] && c[9].v ? String(c[9].v).trim() : '';
+    const codigo = c[2] && c[2].v ? String(c[2].v).trim() : '';
+    const booked = parseGvizDateOTA(c[0]);
+    const t = tourRaw.toLowerCase();
+    const tour = t.includes('canteras') ? 'canteras' : t.includes('portugu') ? 'portugues' : 'centro';
+    const contactUrl = c[11] && c[11].v ? String(c[11].v).trim() : '';
+    const start = `${fechaTour}T${hora}`;
+    console.log('OTA parsed:', name, fechaTour, tour, source);
+    result.push({ name, phone, email, people, start, booked, tour, source, codigo, tourRaw, contactUrl });
+  });
+  console.log('OTA total:', result.length);
+  return result;
+}
+
 // Google siempre llama a google.visualization.Query.setResponse(json)
 // Para cargar dos hojas usamos dos callbacks distintos via query param handler
 window.google = { visualization: { Query: { setResponse: function(json) {
+  // Si estamos cargando datos de OTA
+  if (window._loadingOTA) {
+    clearTimeout(window._otaTimeout);
+    window._loadingOTA = false;
+    try {
+      const otaBookings = parseOTA(json);
+      otaBookings.forEach(b => bookings.push(b));
+      bookings.sort((a, b) => a.start.localeCompare(b.start));
+      updateStats();
+      onDataReady();
+      render();
+      const now = new Date();
+      document.getElementById('footer-text').textContent =
+        `Actualizado desde Google Sheets · ${now.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'})}`;
+    } catch(e) { console.error('Error OTA:', e); onDataReady(); render(); }
+    return;
+  }
   // Si estamos cargando datos de Ads, redirigir al handler de Ads
   if (window._loadingAds) {
     window._loadingAds = false;
@@ -1062,9 +1224,9 @@ window.google = { visualization: { Query: { setResponse: function(json) {
     if (loadedCount === SHEETS.length) {
       bookings = [...(pendingData['centro']||[]), ...(pendingData['canteras']||[]), ...(pendingData['portugues']||[])];
       bookings.sort((a, b) => a.start.localeCompare(b.start));
+      onWebLoaded();
+      loadOTABookings();
       loadRatings();
-      updateStats();
-      render();
       const now = new Date();
       document.getElementById('footer-text').textContent =
         `Actualizado desde Google Sheets · ${now.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'})}`;
@@ -1123,7 +1285,7 @@ function parseGviz(json, tour) {
     const key = tour + name + start + email;
     if (seen.has(key)) continue;
     seen.add(key);
-    result.push({ name, phone, email, people, start, booked, tour });
+    result.push({ name, phone, email, people, start, booked, tour, source: 'web' });
   }
   return result;
 }
@@ -1222,7 +1384,7 @@ function renderNovedades() {
     html += `
     <div class="novedad-item">
       <div class="novedad-info">
-        <div class="novedad-nombre">${nombre}</div>
+        <div class="novedad-nombre">${sourceBadge(b)} ${nombre}</div>
         <div class="novedad-detalle">${tourName(b)} · ${b.people} persona${b.people > 1 ? 's' : ''} · ${formatDate(b.start)}</div>
       </div>
       <div class="novedad-tiempo">${timeAgo(b.booked)}</div>
@@ -1321,7 +1483,8 @@ function renderCalendar() {
       const tickHtml = (!isPast && !confirmed)
         ? `<span class="cal-tick unconfirmed">${tickIcon}</span>`
         : `<span class="cal-tick ${confirmed ? 'confirmed' : 'past-tick'}">${tickIcon}</span>`;
-      chips += `<div class="cal-booking-chip ${b.tour}${isPast ? ' past' : ''}" onclick="event.stopPropagation();openPopup(${idx})">${tickHtml}${time} ${shortName}</div>`;
+      const srcLabel = b.source === 'guruwalk' ? ' · GW' : b.source === 'civitatis' ? ' · CV' : '';
+      chips += `<div class="cal-booking-chip ${b.tour}${isPast ? ' past' : ''}" onclick="event.stopPropagation();openPopup(${idx})">${tickHtml}${time} ${shortName}${srcLabel}</div>`;
     });
 
     gridHtml += `
@@ -1414,6 +1577,24 @@ let _manualConfirmIdx = null;
 function openManualConfirm(idx) {
   _manualConfirmIdx = idx;
   document.getElementById('manual-confirm-overlay').style.display = 'flex';
+}
+
+let _civitatisContactUrl = null;
+function openCivitatisContact(name, url) {
+  _civitatisContactUrl = url;
+  document.getElementById('civitatis-contact-msg').textContent = '¿Quieres abrir Civitatis para contactar con ' + name + '?';
+  const el = document.getElementById('civitatis-contact-overlay');
+  el.style.display = 'flex';
+}
+function closeCivitatisContact(e) {
+  if (e && e.target !== document.getElementById('civitatis-contact-overlay')) return;
+  document.getElementById('civitatis-contact-overlay').style.display = 'none';
+  _civitatisContactUrl = null;
+}
+function confirmCivitatisContact() {
+  if (_civitatisContactUrl) window.open(_civitatisContactUrl, '_blank');
+  document.getElementById('civitatis-contact-overlay').style.display = 'none';
+  _civitatisContactUrl = null;
 }
 
 function closeManualConfirm(e) {
@@ -1587,26 +1768,38 @@ function cardActions(b) {
   const svgCall = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
   const svgWA = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`;
 
+  const svgLink = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+  const contactBtn = b.source === 'civitatis' && b.contactUrl
+    ? `<button onclick="openCivitatisContact('${b.name.replace(/'/g,"\\'")}','${b.contactUrl}')" class="action-btn whatsapp confirm-btn" style="background:#dbeafe;color:#1a56db;border:none">${svgLink} Ver contacto</button>`
+    : '';
+
   if (isPast) {
-    // Pasadas: solo botón WhatsApp, sin confirmar
     return `<div class="card-actions">
-      <a href="tel:${phone}" class="action-btn call" title="Llamar">${svgCall}</a>
-      <a href="https://wa.me/${phone}?text=${msg}" target="_blank" class="action-btn whatsapp confirm-btn" title="WhatsApp">${svgWA}</a>
+      ${b.source === 'civitatis'
+        ? contactBtn
+        : `<a href="tel:${phone}" class="action-btn call" title="Llamar">${svgCall}</a>
+           <a href="https://wa.me/${phone}?text=${msg}" target="_blank" class="action-btn whatsapp confirm-btn" title="WhatsApp">${svgWA}</a>`
+      }
     </div>`;
   }
 
-  // Futuras: botón confirmar
   return `<div class="card-actions">
-    <a href="tel:${phone}" class="action-btn call" title="Llamar">${svgCall}</a>
+    ${b.source === 'civitatis'
+      ? contactBtn
+      : `<a href="tel:${phone}" class="action-btn call" title="Llamar">${svgCall}</a>`
+    }
     ${isConfirmed(b)
       ? `<div class="action-btn whatsapp confirm-btn confirmed" onclick="unconfirmBooking(${idx})" title="Toca para revertir" style="cursor:pointer;pointer-events:auto">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           Reserva confirmada
          </div>`
       : `<div style="display:flex;gap:0.35rem">
-          <button class="action-btn whatsapp confirm-btn" onclick="confirmViaWhatsApp(${idx})" title="Confirmar por WhatsApp">
-            ${svgWA} Confirmar reserva
-          </button>
+          ${b.source !== 'civitatis'
+            ? `<button class="action-btn whatsapp confirm-btn" onclick="confirmViaWhatsApp(${idx})" title="Confirmar por WhatsApp">
+                ${svgWA} Confirmar reserva
+               </button>`
+            : ''
+          }
           <button class="action-btn call confirm-btn" onclick="openManualConfirm(${idx})" title="Marcar como confirmada manualmente" style="background:#f0fdf4;color:#15803d;border:none;width:auto;padding:0 0.75rem">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             Confirmar manual
@@ -1641,6 +1834,13 @@ function tourBadgeStyle(tour) {
   if (tour === 'canteras')  return 'background:#dcfce7;color:#15803d';
   if (tour === 'portugues') return 'background:#fed7aa;color:#c2410c';
   return '';
+}
+
+function sourceBadge(b) {
+  const s = b.source || 'web';
+  if (s === 'guruwalk')  return `<span style="background:#ff6b6b;color:white;font-size:0.65rem;font-weight:700;padding:0.1rem 0.45rem;border-radius:4px;letter-spacing:0.02em">Guruwalk</span>`;
+  if (s === 'civitatis') return `<span style="background:#2563eb;color:white;font-size:0.65rem;font-weight:700;padding:0.1rem 0.45rem;border-radius:4px;letter-spacing:0.02em">Civitatis</span>`;
+  return `<span style="background:#e2e8f0;color:#475569;font-size:0.65rem;font-weight:700;padding:0.1rem 0.45rem;border-radius:4px;letter-spacing:0.02em">Web</span>`;
 }
 
 function cardBorderColor(tour) {
@@ -1702,16 +1902,6 @@ function handleAdsData(json) {
     _adsCostByDay[dateStr] = (_adsCostByDay[dateStr] || 0) + cost;
   });
 
-  // Agrupar reservas por fecha de reserva (b.booked)
-  _adsBookingsByDay = {};
-  bookings.forEach(b => {
-    if (isCancelled(b) || !b.booked) return;
-    const day = b.booked.slice(0,10);
-    if (!_adsBookingsByDay[day]) _adsBookingsByDay[day] = { reservas: 0, asistentes: 0 };
-    _adsBookingsByDay[day].reservas++;
-    _adsBookingsByDay[day].asistentes += (b.people || 1);
-  });
-
   _adsAllDays = Object.keys(_adsCostByDay).filter(d => _adsCostByDay[d] > 0).sort().reverse();
 
   // Rango por defecto: último mes
@@ -1723,6 +1913,16 @@ function handleAdsData(json) {
 }
 
 function renderRendimientoPanel(fromDate, toDate) {
+  // Solo reservas Web (las que vinieron por campañas de Ads)
+  _adsBookingsByDay = {};
+  bookings.forEach(b => {
+    if (isCancelled(b) || !b.booked || b.source !== 'web') return;
+    const day = b.booked.slice(0,10);
+    if (!_adsBookingsByDay[day]) _adsBookingsByDay[day] = { reservas: 0, asistentes: 0 };
+    _adsBookingsByDay[day].reservas++;
+    _adsBookingsByDay[day].asistentes += (b.people || 1);
+  });
+
   const todayStr = new Date().toISOString().slice(0, 10);
   const d7 = new Date(); d7.setDate(d7.getDate() - 7);
   const cutoff7  = d7.toISOString().slice(0, 10);
@@ -1875,6 +2075,7 @@ function render() {
           <div class="card-header">
             <div style="display:flex;align-items:center;gap:0.5rem;min-width:0">
               <span class="badge" style="${tourBadgeStyle(b.tour)};flex-shrink:0">${tourLabel(b.tour)}</span>
+              ${sourceBadge(b)}
               <div class="card-name">${b.name}</div>
             </div>
             <div style="display:flex;align-items:center;gap:0.35rem;flex-shrink:0">
@@ -1906,6 +2107,7 @@ function render() {
           <div class="card-header">
             <div style="display:flex;align-items:center;gap:0.5rem;min-width:0">
               <span class="badge" style="${tourBadgeStyle(b.tour)};opacity:0.6;flex-shrink:0">${tourLabel(b.tour)}</span>
+              ${sourceBadge(b)}
               <div class="card-name">${b.name}</div>
             </div>
             <div style="display:flex;align-items:center;gap:0.35rem;flex-shrink:0">
@@ -1984,7 +2186,10 @@ function openPopup(idx) {
     `<svg width="16" height="16" viewBox="${viewBox}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
 
   content.innerHTML = `
-    <div class="popup-tour-badge ${b.tour}">${tourName}</div>
+    <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem">
+      <div class="popup-tour-badge ${b.tour}" style="margin-bottom:0">${tourName}</div>
+      ${sourceBadge(b)}
+    </div>
     <div class="popup-name">${b.name}</div>
     <div class="popup-row">
       <div class="popup-row-icon blue">${iconSvg('<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>')}</div>
@@ -2503,25 +2708,28 @@ function openTasksPanel() {
     const idx = bookings.indexOf(b);
     const phone = b.phone.replace(/\s+/g, '');
     const tour = tourLabel(b.tour);
+    const srcColor = b.source === 'civitatis' ? '#2563eb' : b.source === 'guruwalk' ? '#e05252' : '#94a3b8';
+    const srcLabel = b.source === 'civitatis' ? 'Civitatis' : b.source === 'guruwalk' ? 'Guruwalk' : 'Web';
+    const svgWAicon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`;
+    const svgLink = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+    const primaryBtn = b.source === 'civitatis' && b.contactUrl
+      ? `<button onclick="openCivitatisContact('${b.name.replace(/'/g,"\\'")}','${b.contactUrl}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:0.35rem;background:#1a56db;color:white;border:none;border-radius:10px;padding:0.55rem 0.75rem;font-size:0.82rem;font-weight:700;cursor:pointer">${svgLink} Ver contacto</button>`
+      : `<button onclick="confirmViaWhatsApp(${idx},true)" style="flex:1;display:flex;align-items:center;justify-content:center;gap:0.35rem;background:#15803d;color:white;border:none;border-radius:10px;padding:0.55rem 0.75rem;font-size:0.82rem;font-weight:700;cursor:pointer">${svgWAicon} Confirmar por WA</button>`;
     return `
-    <div style="padding:0.75rem 0;border-bottom:1px solid #f1f5f9">
-      <div style="margin-bottom:0.5rem">
-        <div style="font-weight:600;font-size:0.88rem;color:#1a202c">${b.name}</div>
-        <div style="font-size:0.75rem;color:#94a3b8;margin-top:1px">${tour} · ${fmtDate(b.start)}</div>
-        <div style="font-size:0.68rem;color:#cbd5e1;margin-top:2px">${b.phone} · ${b.email}</div>
+    <div style="border:1px solid #e2e8f0;border-left:3px solid ${srcColor};border-radius:12px;padding:0.75rem;margin-bottom:0.5rem;background:white">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.2rem">
+        <span style="font-weight:700;font-size:0.95rem;color:#0f172a">${b.name}</span>
+        <span style="font-size:0.68rem;font-weight:600;color:${srcColor}">${srcLabel}</span>
       </div>
-      <div style="display:flex;gap:0.4rem">
-        <button onclick="confirmViaWhatsApp(${idx},true)" style="background:#dcfce7;color:#15803d;border:none;border-radius:8px;padding:0.35rem 0.6rem;font-size:0.75rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.25rem">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-          Confirmar
+      <div style="font-size:0.78rem;color:#64748b;margin-bottom:0.05rem">${tour} · ${fmtDate(b.start)}</div>
+      <div style="font-size:0.72rem;color:#94a3b8;margin-bottom:0.65rem">${b.phone}${b.email ? ' · ' + b.email : ''}</div>
+      <div style="display:flex;align-items:center;gap:0.4rem">
+        ${primaryBtn}
+        <button onclick="openManualConfirm(${idx})" style="display:flex;align-items:center;gap:0.25rem;background:#f1f5f9;color:#475569;border:none;border-radius:10px;padding:0.55rem 0.65rem;font-size:0.78rem;font-weight:600;cursor:pointer;white-space:nowrap">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Manual
         </button>
-        <button onclick="openManualConfirm(${idx})" style="background:#f0fdf4;color:#15803d;border:none;border-radius:8px;padding:0.35rem 0.6rem;font-size:0.75rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.25rem">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          Manual
-        </button>
-        <button onclick="closeTasksPanelDirect();openCancelPopup(${idx})" style="background:#fff1f2;color:#e11d48;border:none;border-radius:8px;padding:0.35rem 0.6rem;font-size:0.75rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.25rem">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          Cancelar
+        <button onclick="closeTasksPanelDirect();openCancelPopup(${idx})" style="display:flex;align-items:center;justify-content:center;background:#fff1f2;color:#e11d48;border:none;border-radius:10px;padding:0.55rem 0.6rem;font-size:0.78rem;cursor:pointer" title="Cancelar reserva">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
     </div>`;
@@ -2531,24 +2739,24 @@ function openTasksPanel() {
     const idx = bookings.indexOf(b);
     const phone = b.phone.replace(/\s+/g, '');
     const tour = tourFullName(b.tour);
-    const reviewMsgRaw = '\u00a1Hola! \ud83d\udc4b\n\nHa sido un placer tenerte en el ' + tour + '. Si te gust\u00f3 la experiencia, tanto como a mi. Ay\u00fadame dejando una rese\u00f1a. Solo te llevar\u00e1 un minuto.\n\n\ud83d\udc49 https://g.page/r/Cb4LHaNCVqszEBM/review\n\n\u00a1Mil gracias por el apoyo! \ud83e\udd17\u2764\ufe0f';
-    const reviewMsg = encodeURIComponent(reviewMsgRaw);
+    const srcColor = b.source === 'civitatis' ? '#2563eb' : b.source === 'guruwalk' ? '#e05252' : '#94a3b8';
+    const srcLabel = b.source === 'civitatis' ? 'Civitatis' : b.source === 'guruwalk' ? 'Guruwalk' : 'Web';
+    const svgWAicon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`;
+    const showWA = b.source !== 'civitatis' && phone;
+    const showMail = b.source === 'web' && b.email;
     return `
-    <div style="display:flex;align-items:center;gap:0.65rem;padding:0.75rem 0;border-bottom:1px solid #f1f5f9">
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:0.88rem;color:#1a202c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.name}</div>
-        <div style="font-size:0.75rem;color:#94a3b8;margin-top:1px">${tourLabel(b.tour)} · ${fmtDate(b.start)}</div>
-        <div style="font-size:0.68rem;color:#cbd5e1;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.phone} · ${b.email}</div>
+    <div style="border:1px solid #e2e8f0;border-left:3px solid ${srcColor};border-radius:12px;padding:0.75rem;margin-bottom:0.5rem;background:white">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.2rem">
+        <span style="font-weight:700;font-size:0.95rem;color:#0f172a">${b.name}</span>
+        <span style="font-size:0.68rem;font-weight:600;color:${srcColor}">${srcLabel}</span>
       </div>
-      <div style="display:flex;gap:0.4rem;flex-shrink:0">
-        <a href="#" onclick="event.preventDefault();sendReviewWA(${idx},'${phone}','${tour.replace(/'/g,"\\'")}');return false" style="background:#f0fdf4;color:#15803d;border:none;border-radius:8px;padding:0.35rem 0.6rem;font-size:0.75rem;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:0.25rem">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-          WA
-        </a>
-        <a href="#" onclick="event.preventDefault();sendReviewEmail(${idx});return false" style="background:#eff6ff;color:#1a56db;border:none;border-radius:8px;padding:0.35rem 0.6rem;font-size:0.75rem;font-weight:600;text-decoration:none;display:flex;align-items:center">
-          Mail
-        </a>
-        <button onclick="markReviewRequested(bookings[${idx}],'manual');updateTasksBadge();renderTaskRows()" style="background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;padding:0.35rem 0.5rem;font-size:0.75rem;cursor:pointer" title="Marcar como hecho">✓</button>
+      <div style="font-size:0.78rem;color:#64748b;margin-bottom:0.65rem">${tourLabel(b.tour)} · ${fmtDate(b.start)}</div>
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap">
+        ${showWA ? `<a href="#" onclick="event.preventDefault();sendReviewWA(${idx},'${phone}','${tour.replace(/'/g,"\\'")}');return false" style="display:flex;align-items:center;gap:0.3rem;background:#15803d;color:white;border-radius:10px;padding:0.5rem 0.75rem;font-size:0.8rem;font-weight:700;text-decoration:none">${svgWAicon} Pedir por WA</a>` : ''}
+        ${showMail ? `<a href="#" onclick="event.preventDefault();sendReviewEmail(${idx});return false" style="display:flex;align-items:center;gap:0.3rem;background:#1a56db;color:white;border-radius:10px;padding:0.5rem 0.75rem;font-size:0.8rem;font-weight:700;text-decoration:none">✉️ Por mail</a>` : ''}
+        <button onclick="markReviewRequested(bookings[${idx}],'manual');updateTasksBadge();renderTaskRows()" style="display:flex;align-items:center;gap:0.25rem;background:#f1f5f9;color:#475569;border:none;border-radius:10px;padding:0.5rem 0.65rem;font-size:0.78rem;font-weight:600;cursor:pointer">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Manual
+        </button>
       </div>
     </div>`;
   }).join('');
@@ -2562,17 +2770,21 @@ function openTasksPanel() {
     </div>
 
     ${toConfirm.length > 0 ? `
-    <div style="margin-bottom:1rem">
-      <div style="font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.25rem">
-        Confirmar reservas · ${toConfirm.length}
+    <div style="margin-bottom:1.25rem">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:2px solid #f1f5f9">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span style="font-size:1rem;font-weight:800;color:#0f172a">Confirmar reservas</span>
+        <span style="background:#dcfce7;color:#15803d;font-size:0.72rem;font-weight:700;border-radius:99px;padding:0.1rem 0.55rem">${toConfirm.length}</span>
       </div>
       <div id="confirm-rows">${confirmRows}</div>
     </div>` : ''}
 
     ${toReview.length > 0 ? `
-    <div style="margin-bottom:1rem">
-      <div style="font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.25rem">
-        Pedir reseña · ${toReview.length}
+    <div style="margin-bottom:1.25rem">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:2px solid #f1f5f9">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span style="font-size:1rem;font-weight:800;color:#0f172a">Pedir reseñas</span>
+        <span style="background:#dbeafe;color:#1a56db;font-size:0.72rem;font-weight:700;border-radius:99px;padding:0.1rem 0.55rem">${toReview.length}</span>
       </div>
       <div id="review-rows">${reviewRows}</div>
     </div>` : ''}
@@ -2724,11 +2936,11 @@ function renderOpiniones() {
            <button onclick="localStorage.removeItem(reviewKey(bookings[${idx}]));renderOpiniones()" style="background:none;border:none;color:#cbd5e1;font-size:0.72rem;cursor:pointer;padding:0.2rem 0.35rem;border-radius:6px;transition:color 0.15s" title="Deshacer" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#cbd5e1'">↩ deshacer</button>
          </div>`
       : `<div style="display:flex;gap:0.4rem;flex-wrap:wrap">
-           <a href="#" onclick="event.preventDefault();sendReviewWA(${idx},'${phone}','${tour.replace(/'/g,"\\'")}');return false" style="display:flex;align-items:center;gap:0.3rem;background:#f0fdf4;color:#15803d;border-radius:8px;padding:0.35rem 0.65rem;font-size:0.78rem;font-weight:600;text-decoration:none">
+           ${b.source !== 'civitatis' && phone ? `<a href="#" onclick="event.preventDefault();sendReviewWA(${idx},'${phone}','${tour.replace(/'/g,"\\'")}');return false" style="display:flex;align-items:center;gap:0.3rem;background:#f0fdf4;color:#15803d;border-radius:8px;padding:0.35rem 0.65rem;font-size:0.78rem;font-weight:600;text-decoration:none">
              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
              WA
-           </a>
-           <a href="#" onclick="event.preventDefault();sendReviewEmail(${idx});return false" style="background:#eff6ff;color:#1a56db;border-radius:8px;padding:0.35rem 0.65rem;font-size:0.78rem;font-weight:600;text-decoration:none">✉️ Mail</a>
+           </a>` : ''}
+           ${b.source === 'web' && b.email ? `<a href="#" onclick="event.preventDefault();sendReviewEmail(${idx});return false" style="background:#eff6ff;color:#1a56db;border-radius:8px;padding:0.35rem 0.65rem;font-size:0.78rem;font-weight:600;text-decoration:none">✉️ Mail</a>` : ''}
            <button onclick="markReviewRequested(bookings[${idx}],'manual');renderOpiniones()" style="background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;padding:0.35rem 0.5rem;font-size:0.78rem;cursor:pointer" title="Marcar como hecho">✓</button>
          </div>`;
 
@@ -2737,6 +2949,7 @@ function renderOpiniones() {
         <div class="card-header">
           <div style="display:flex;align-items:center;gap:0.5rem;min-width:0">
             <span class="badge" style="${tourBadgeStyle(b.tour)};opacity:0.7;flex-shrink:0">${tourLabel(b.tour)}</span>
+            ${sourceBadge(b)}
             <div class="card-name">${b.name}</div>
           </div>
           <button class="card-delete-btn" onclick="event.stopPropagation();openDeleteConfirm(${idx})" title="Eliminar reserva">✕</button>
@@ -2853,14 +3066,47 @@ function exitDemo() {
 const AUTH_KEY = 'cristitours_auth';
 const PIN = '1234';
 
-function checkAuth() {
+// --- Loading screen logic ---
+let _dataReady = false;
+let _minWaitDone = false;
+const SVG_CHECK = `<svg class="ld-check" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5 8.5 6.5 12.5 13.5 3.5"/></svg>`;
+
+function ldTick(iconId, barPct) {
+  const el = document.getElementById(iconId);
+  if (el) { el.outerHTML = SVG_CHECK; }
+  const bar = document.getElementById('ld-bar');
+  if (bar) bar.style.width = barPct + '%';
+}
+
+function onWebLoaded()  { ldTick('ld-web-icon', 33); }
+function onOTALoaded()  { ldTick('ld-civ-icon', 66); ldTick('ld-gw-icon', 100); }
+
+function onDataReady() {
+  if (_dataReady) return;
+  _dataReady = true;
+  onOTALoaded();
+  if (_minWaitDone) proceedAfterLoading();
+}
+
+function proceedAfterLoading() {
+  const screen = document.getElementById('loading-screen');
+  screen.style.transition = 'opacity 0.35s';
+  screen.style.opacity = '0';
+  setTimeout(() => { screen.style.display = 'none'; screen.style.opacity = '1'; }, 350);
   if (sessionStorage.getItem(AUTH_KEY) === '1') {
-    document.getElementById('auth-screen').style.display = 'none';
-    loadAll();
+    render();
     setInterval(loadAll, 2 * 60 * 1000);
   } else {
     document.getElementById('auth-screen').style.display = 'flex';
   }
+}
+
+function startLoadingScreen() {
+  loadAll();
+  setTimeout(() => {
+    _minWaitDone = true;
+    if (_dataReady) proceedAfterLoading();
+  }, 1200);
 }
 
 function authInput(digit) {
@@ -2876,7 +3122,7 @@ function authInput(digit) {
     if (current === PIN) {
       sessionStorage.setItem(AUTH_KEY, '1');
       document.getElementById('auth-screen').style.display = 'none';
-      loadAll();
+      render();
       setInterval(loadAll, 2 * 60 * 1000);
     } else {
       setTimeout(() => {
@@ -2899,7 +3145,7 @@ function authDelete() {
   dots.forEach((d, i) => d.classList.toggle('filled', i < current.length));
 }
 
-checkAuth();
+startLoadingScreen();
 </script>
 
 </body>
