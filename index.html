@@ -963,9 +963,9 @@
   <button class="filter-btn active" data-group="time" data-val="all" onclick="setFilter('all')">Todas</button>
   <button class="filter-btn" data-group="time" data-val="today" onclick="setFilter('today')">Hoy</button>
   <button class="filter-btn" data-group="time" data-val="tomorrow" onclick="setFilter('tomorrow')">Mañana</button>
-  <button class="filter-btn" data-group="time" data-val="future" onclick="setFilter('future')">Próximas</button>
   <button class="filter-btn" data-group="time" data-val="calendar" onclick="setFilter('calendar')">Calendario</button>
   <button class="filter-btn" data-group="time" data-val="past" onclick="setFilter('past')">Pasadas</button>
+  <button class="filter-btn" data-group="time" data-val="cancelled" onclick="setFilter('cancelled')">Canceladas</button>
   <span style="color:#e2e8f0;font-size:1rem;line-height:1;align-self:center">|</span>
   <button id="opiniones-btn" class="filter-btn" data-group="time" data-val="opiniones" onclick="setFilter('opiniones')" style="color:#b0bac7;font-size:0.78rem">★ Opiniones</button>
   <button class="filter-btn" data-group="time" data-val="rendimiento" onclick="setFilter('rendimiento')" style="color:#b0bac7;font-size:0.78rem">📊 Rendimiento</button>
@@ -986,11 +986,34 @@
 <div id="civitatis-contact-overlay" onclick="closeCivitatisContact(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1010;align-items:center;justify-content:center">
   <div onclick="event.stopPropagation()" style="background:white;border-radius:16px;padding:1.5rem;max-width:300px;width:88%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
     <div style="font-size:2rem;margin-bottom:0.6rem">🔗</div>
-    <div style="font-weight:700;font-size:0.95rem;color:#1a202c;margin-bottom:0.4rem">Abrir Civitatis</div>
+    <div style="font-weight:700;font-size:0.95rem;color:#1a202c;margin-bottom:0.4rem">Ver reserva en Civitatis</div>
     <div id="civitatis-contact-msg" style="font-size:0.82rem;color:#64748b;margin-bottom:1.25rem;line-height:1.5"></div>
     <div style="display:flex;gap:0.6rem">
       <button onclick="closeCivitatisContact()" style="flex:1;padding:0.7rem;background:#f1f5f9;color:#64748b;border:none;border-radius:10px;font-weight:600;font-size:0.88rem;cursor:pointer">Cancelar</button>
       <button id="civitatis-contact-confirm-btn" onclick="confirmCivitatisContact()" style="flex:1;padding:0.7rem;background:#1a56db;color:white;border:none;border-radius:10px;font-weight:700;font-size:0.88rem;cursor:pointer">Abrir</button>
+    </div>
+  </div>
+</div>
+
+<div id="guruwalk-cancel-overlay" onclick="closeGuruWalkCancel(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1010;align-items:center;justify-content:center">
+  <div onclick="event.stopPropagation()" style="background:white;border-radius:16px;padding:1.5rem;max-width:320px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
+    <div style="font-size:1.5rem;margin-bottom:0.4rem;text-align:center">🔴</div>
+    <div style="font-weight:700;font-size:0.95rem;color:#1a202c;margin-bottom:0.25rem;text-align:center">Gestionar reserva — Guruwalk</div>
+    <div id="guruwalk-cancel-name" style="font-size:0.82rem;color:#64748b;margin-bottom:1.1rem;text-align:center;line-height:1.4"></div>
+    <div style="display:flex;flex-direction:column;gap:0.5rem">
+      <a id="guruwalk-cancel-link" href="https://www.guruwalk.com/es/login" target="_blank" onclick="closeGuruWalkCancel()" style="display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;background:#fff0f0;color:#e05252;border-radius:10px;font-weight:700;font-size:0.85rem;text-decoration:none">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Cancelar vía Guruwalk
+      </a>
+      <button id="guruwalk-cancel-wa-btn" onclick="guruWalkCancelWA()" style="display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;background:#f0fdf4;color:#15803d;border:none;border-radius:10px;font-weight:700;font-size:0.85rem;cursor:pointer;text-align:left">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+        Cancelar vía WhatsApp
+      </button>
+      <button id="guruwalk-change-wa-btn" onclick="guruWalkChangeWA()" style="display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;background:#eff6ff;color:#1d4ed8;border:none;border-radius:10px;font-weight:700;font-size:0.85rem;cursor:pointer;text-align:left">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Proponer cambio de hora
+      </button>
+      <button onclick="closeGuruWalkCancel()" style="padding:0.65rem;background:#f1f5f9;color:#64748b;border:none;border-radius:10px;font-weight:600;font-size:0.85rem;cursor:pointer;margin-top:0.1rem">Cerrar</button>
     </div>
   </div>
 </div>
@@ -1054,6 +1077,7 @@
 
 <div id="footer" class="footer" style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem">
   <span id="footer-text">Cargando datos...</span>
+  <span id="debug-info" style="font-size:0.65rem;color:rgba(255,255,255,0.5)"></span>
   <button onclick="loadDemo()" style="background:rgba(255,255,255,0.15);border:none;color:inherit;border-radius:8px;padding:0.25rem 0.6rem;font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap">Demo</button>
 </div>
 
@@ -1065,6 +1089,7 @@ const SHEETS = [
 ];
 
 let bookings = [];
+let otaBookingsCache = [];
 let loadedCount = 0;
 const pendingData = {};
 let ratings = [];
@@ -1099,23 +1124,25 @@ function loadRatings() {
 const OTA_SHEET_ID   = '16F7BZB0rP3HWY91yTu8GH-ICEZfMZcjzzjg457lfALE';
 const OTA_SHEET_NAME = 'Reservas';
 
+function dbg(msg) { console.log('[OTA]', msg); }
+
 function loadOTABookings() {
   const old = document.getElementById('ota-script');
   if (old) old.remove();
   const script = document.createElement('script');
   script.id = 'ota-script';
   window._loadingOTA = true;
+  if (window._otaRetries === undefined) window._otaRetries = 0;
+  dbg('OTA: cargando...');
   window._otaTimeout = setTimeout(() => {
-    if (window._loadingOTA) {
-      window._loadingOTA = false;
-      console.warn('OTA timeout — rendering without OTA data');
-      onDataReady(); render();
-    }
+    // Timeout: avanza la UI pero mantiene _loadingOTA para procesar datos si llegan tarde
+    console.warn('OTA timeout');
+    onDataReady(); render();
   }, 8000);
   script.onerror = () => {
     clearTimeout(window._otaTimeout);
     window._loadingOTA = false;
-    console.warn('OTA load error — rendering without OTA data');
+    dbg('OTA: ERROR al cargar');
     onDataReady(); render();
   };
   script.src = `https://docs.google.com/spreadsheets/d/${OTA_SHEET_ID}/gviz/tq?tqx=out:json&sheet=${OTA_SHEET_NAME}&t=${Date.now()}`;
@@ -1157,6 +1184,30 @@ function parseGvizDateOTA(cell) {
   return s.slice(0,10);
 }
 
+// Like parseGvizDateOTA but preserves time if the cell contains a datetime
+function parseGvizDateTimeOTA(cell) {
+  if (!cell || cell.v == null) return '';
+  const v = cell.v;
+  if (typeof v === 'string' && v.startsWith('Date(')) {
+    const parts = v.replace('Date(','').replace(')','').split(',').map(Number);
+    if (parts.length >= 3) {
+      const y  = parts[0];
+      const mo = String(parts[1] + 1).padStart(2,'0');
+      const d  = String(parts[2]).padStart(2,'0');
+      if (parts.length >= 5) {
+        const hh = String(parts[3]).padStart(2,'0');
+        const mm = String(parts[4]).padStart(2,'0');
+        return `${y}-${mo}-${d}T${hh}:${mm}`;
+      }
+      return `${y}-${mo}-${d}`;
+    }
+  }
+  // Fallback: try formatted value
+  const s = String(cell.f || cell.v);
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,16);
+  return parseGvizDateOTA(cell);
+}
+
 function parseOTA(json) {
   // Columnas nueva hoja: A=Fecha procesado, B=Fuente, C=Código, D=Nombre, E=Personas,
   //                      F=Tour, G=Fecha tour, H=Hora, I=Teléfono, J=Email, K=Estado
@@ -1166,7 +1217,7 @@ function parseOTA(json) {
     const c = row.c;
     if (!c) return;
     const estado = c[10] && c[10].v ? String(c[10].v).trim() : '';
-    if (estado === 'Cancelada') return;
+    const otaCancelled = estado === 'Cancelada';
     const fuenteRaw = c[1] && c[1].v ? String(c[1].v).trim().toLowerCase() : '';
     const source = fuenteRaw.includes('civitatis') ? 'civitatis' : fuenteRaw.includes('guruwalk') ? 'guruwalk' : 'web';
     const name    = c[3] && c[3].v ? String(c[3].v).trim() : '';
@@ -1174,20 +1225,19 @@ function parseOTA(json) {
     const people   = c[4] && c[4].v != null ? parseInt(c[4].v) || 1 : 1;
     const tourRaw  = c[5] && c[5].v ? String(c[5].v).trim() : '';
     const fechaTour = parseGvizDateOTA(c[6]);
-    if (!fechaTour) return;
+    if (!fechaTour && !otaCancelled) return;
     const hora   = parseGvizTimeOTA(c[7]);
     const phone  = c[8] && c[8].v ? String(c[8].v).trim() : '';
     const email  = c[9] && c[9].v ? String(c[9].v).trim() : '';
     const codigo = c[2] && c[2].v ? String(c[2].v).trim() : '';
-    const booked = parseGvizDateOTA(c[0]);
+    const booked = parseGvizDateTimeOTA(c[0]);
     const t = tourRaw.toLowerCase();
     const tour = t.includes('canteras') ? 'canteras' : t.includes('portugu') ? 'portugues' : 'centro';
     const contactUrl = c[11] && c[11].v ? String(c[11].v).trim() : '';
-    const start = `${fechaTour}T${hora}`;
-    console.log('OTA parsed:', name, fechaTour, tour, source);
-    result.push({ name, phone, email, people, start, booked, tour, source, codigo, tourRaw, contactUrl });
+    const startDate = fechaTour || booked.slice(0,10) || '1970-01-01';
+    const start = `${startDate}T${hora}`;
+    result.push({ name, phone, email, people, start, booked, tour, source, codigo, tourRaw, contactUrl, otaCancelled });
   });
-  console.log('OTA total:', result.length);
   return result;
 }
 
@@ -1199,9 +1249,21 @@ window.google = { visualization: { Query: { setResponse: function(json) {
     clearTimeout(window._otaTimeout);
     window._loadingOTA = false;
     try {
-      const otaBookings = parseOTA(json);
-      otaBookings.forEach(b => bookings.push(b));
+      const parsed = parseOTA(json);
+      if (parsed.length === 0 && (window._otaRetries || 0) < 3) {
+        // Respuesta vacía inesperada — reintentar
+        window._otaRetries = (window._otaRetries || 0) + 1;
+        dbg('OTA: 0 reservas, reintento ' + window._otaRetries + '/3...');
+        setTimeout(loadOTABookings, 2000);
+        return;
+      }
+      window._otaRetries = 0;
+      if (parsed.length > 0) otaBookingsCache = parsed;
+      // Rebuild bookings: web + OTA cache
+      const webOnly = bookings.filter(b => b.source === 'web');
+      bookings = [...webOnly, ...otaBookingsCache];
       bookings.sort((a, b) => a.start.localeCompare(b.start));
+      dbg('OTA: ' + otaBookingsCache.length + ' reservas');
       updateStats();
       onDataReady();
       render();
@@ -1225,7 +1287,9 @@ window.google = { visualization: { Query: { setResponse: function(json) {
     pendingData[tourKey] = parseGviz(json, tourKey);
     loadedCount++;
     if (loadedCount === SHEETS.length) {
-      bookings = [...(pendingData['centro']||[]), ...(pendingData['canteras']||[]), ...(pendingData['portugues']||[])];
+      const webBookings = [...(pendingData['centro']||[]), ...(pendingData['canteras']||[]), ...(pendingData['portugues']||[])];
+      // Merge with cached OTA so they're visible immediately while new OTA loads
+      bookings = [...webBookings, ...otaBookingsCache];
       bookings.sort((a, b) => a.start.localeCompare(b.start));
       onWebLoaded();
       loadOTABookings();
@@ -1257,6 +1321,7 @@ function loadSheet(sheetDef) {
 async function loadAll() {
   document.getElementById('app').innerHTML = '<div class="empty">Cargando reservas...</div>';
   loadedCount = 0;
+  window._otaRetries = 0;
   for (const sheet of SHEETS) {
     window._pendingTour = sheet.tour;
     await loadSheet(sheet);
@@ -1340,6 +1405,10 @@ function dismissAllNovedades() {
   renderNovedades();
 }
 
+function localDateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
 function parseBookedTime(booked) {
   if (!booked) return null;
   return booked.includes('T') ? new Date(booked).getTime() : new Date(booked + 'T12:00').getTime();
@@ -1348,9 +1417,15 @@ function parseBookedTime(booked) {
 function getNovedades() {
   const now = Date.now();
   const h24 = 24 * 60 * 60 * 1000;
+  const todayStr = localDateStr(new Date());
+  const yesterdayStr = localDateStr(new Date(now - 86400000));
   return bookings
     .filter(b => {
       if (!b.booked) return false;
+      if (!b.booked.includes('T')) {
+        const d = b.booked.slice(0,10);
+        return (d === todayStr || d === yesterdayStr) && !localStorage.getItem(dismissedKey(b));
+      }
       const bookedTime = parseBookedTime(b.booked);
       return (now - bookedTime) < h24 && !localStorage.getItem(dismissedKey(b));
     })
@@ -1358,6 +1433,14 @@ function getNovedades() {
 }
 
 function timeAgo(booked) {
+  // If no time component, show relative day label instead of a made-up hour count
+  if (booked && !booked.includes('T')) {
+    const today = localDateStr(new Date());
+    const yesterday = localDateStr(new Date(Date.now() - 86400000));
+    if (booked.slice(0,10) === today) return 'hoy';
+    if (booked.slice(0,10) === yesterday) return 'ayer';
+    return booked.slice(0,10);
+  }
   const diff = Date.now() - parseBookedTime(booked);
   const h = Math.floor(diff / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
@@ -1377,7 +1460,7 @@ function renderNovedades() {
 
   let html = `<div class="novedades-wrap">
     <div class="novedades-header">
-      <div class="novedades-title">${svgBell} ${items.length} reserva${items.length > 1 ? 's han' : ' ha'} entrado en las últimas 24h</div>
+      <div class="novedades-title">${svgBell} ${items.length} reserva${items.length > 1 ? 's han' : ' ha'} entrado hoy o ayer</div>
       ${items.length > 1 ? `<button class="novedades-dismiss-all" onclick="dismissAllNovedades()">Limpiar todo</button>` : ''}
     </div>`;
 
@@ -1564,7 +1647,7 @@ function cancelledKey(b) {
 }
 
 function isCancelled(b) {
-  return localStorage.getItem(cancelledKey(b)) === '1';
+  return b.otaCancelled === true || localStorage.getItem(cancelledKey(b)) === '1';
 }
 
 function deletedKey(b) {
@@ -1583,9 +1666,74 @@ function openManualConfirm(idx) {
 }
 
 let _civitatisContactUrl = null;
+let _gwCancelBooking = null;
+function openGuruWalkCancelPopup(idx) {
+  const b = bookings[idx];
+  _gwCancelBooking = b;
+  const nombre = toTitleCase(b.name.trim().split(/\s+/)[0]);
+  const [datePart, timePart] = b.start.split('T');
+  const [y, mo, d] = datePart.split('-');
+  const dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const dt = new Date(+y, +mo-1, +d);
+  const fechaMsg = `${dias[dt.getDay()]} ${+d} de ${meses[+mo-1]} a las ${timePart}`;
+  document.getElementById('guruwalk-cancel-name').textContent = b.name + ' · ' + fechaMsg;
+  // Update Guruwalk management link if available
+  const link = document.getElementById('guruwalk-cancel-link');
+  link.href = b.contactUrl || 'https://www.guruwalk.com/es/login';
+  document.getElementById('guruwalk-cancel-overlay').style.display = 'flex';
+}
+function closeGuruWalkCancel(e) {
+  if (e && e.target !== document.getElementById('guruwalk-cancel-overlay')) return;
+  document.getElementById('guruwalk-cancel-overlay').style.display = 'none';
+  _gwCancelBooking = null;
+}
+function guruWalkCancelWA() {
+  if (!_gwCancelBooking) return;
+  const b = _gwCancelBooking;
+  const phone = b.phone.replace(/\s+/g, '');
+  const nombre = toTitleCase(b.name.trim().split(/\s+/)[0]);
+  const [datePart, timePart] = b.start.split('T');
+  const [y, mo, d] = datePart.split('-');
+  const dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const dt = new Date(+y, +mo-1, +d);
+  const fechaMsg = `${dias[dt.getDay()]} ${+d} de ${meses[+mo-1]} a las ${timePart}`;
+  const msg = `Hola, ${nombre} 👋 Soy Cristina de Cristitours.\n\nLamentablemente tenemos que cancelar tu reserva del Free Tour del ${fechaMsg}.\n\nDisculpa las molestias y esperamos verte pronto. 🙏`;
+  window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+  document.getElementById('guruwalk-cancel-overlay').style.display = 'none';
+}
+function guruWalkChangeWA() {
+  if (!_gwCancelBooking) return;
+  const b = _gwCancelBooking;
+  const phone = b.phone.replace(/\s+/g, '');
+  const nombre = toTitleCase(b.name.trim().split(/\s+/)[0]);
+  const [datePart, timePart] = b.start.split('T');
+  const [y, mo, d] = datePart.split('-');
+  const dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const dt = new Date(+y, +mo-1, +d);
+  const fechaMsg = `${dias[dt.getDay()]} ${+d} de ${meses[+mo-1]}`;
+  const msg = `Hola, ${nombre} 👋 Soy Cristina de Cristitours.\n\nTe escribo sobre tu reserva del Free Tour del ${fechaMsg}. Necesitaríamos proponerte un cambio de horario.\n\n¿Te vendría bien a las [HORA]? Quedo pendiente de tu respuesta 😊`;
+  window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+  document.getElementById('guruwalk-cancel-overlay').style.display = 'none';
+}
+
+function openCivitatisConfirm(name, url) {
+  _civitatisContactUrl = url;
+  document.getElementById('civitatis-contact-msg').textContent = '¿Quieres confirmar la reserva de ' + name + ' a través de Civitatis? Se abrirá el panel de control.';
+  document.getElementById('civitatis-contact-overlay').style.display = 'flex';
+}
+
+function openCivitatisCancel(name, url) {
+  _civitatisContactUrl = url;
+  document.getElementById('civitatis-contact-msg').textContent = '¿Quieres cancelar la reserva de ' + name + ' a través de Civitatis? Se abrirá el panel de control.';
+  document.getElementById('civitatis-contact-overlay').style.display = 'flex';
+}
+
 function openCivitatisContact(name, url) {
   _civitatisContactUrl = url;
-  document.getElementById('civitatis-contact-msg').textContent = '¿Quieres abrir Civitatis para contactar con ' + name + '?';
+  document.getElementById('civitatis-contact-msg').textContent = 'Abrir el panel de control de Civitatis para la reserva de ' + name + '.';
   const el = document.getElementById('civitatis-contact-overlay');
   el.style.display = 'flex';
 }
@@ -1773,7 +1921,9 @@ function cardActions(b) {
 
   const svgLink = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
   const contactBtn = b.source === 'civitatis' && b.contactUrl
-    ? `<button onclick="openCivitatisContact('${b.name.replace(/'/g,"\\'")}','${b.contactUrl}')" class="action-btn whatsapp confirm-btn" style="background:#dbeafe;color:#1a56db;border:none">${svgLink} Ver contacto</button>`
+    ? `<button onclick="openCivitatisConfirm('${b.name.replace(/'/g,"\\'")}','${b.contactUrl}')" class="action-btn whatsapp confirm-btn" style="background:#dbeafe;color:#1a56db;border:none">${svgLink} Confirmar reserva</button>`
+    : b.source === 'guruwalk' && !isPast
+    ? `<button onclick="openGuruWalkCancelPopup(${idx})" class="action-btn whatsapp confirm-btn" style="background:#fff0f0;color:#e05252;border:none">${svgLink} Gestionar reserva</button>`
     : '';
 
   if (isPast) {
@@ -1809,7 +1959,12 @@ function cardActions(b) {
           </button>
          </div>`
     }
-    <button class="cancel-btn" onclick="openCancelPopup(${idx})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Cancelar</button>
+    ${b.source === 'civitatis' && b.contactUrl
+      ? `<button class="cancel-btn" onclick="openCivitatisCancel('${b.name.replace(/'/g,"\\'")}','${b.contactUrl}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Cancelar</button>`
+      : b.source === 'guruwalk'
+      ? `<button class="cancel-btn" onclick="openGuruWalkCancelPopup(${idx})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Cancelar</button>`
+      : `<button class="cancel-btn" onclick="openCancelPopup(${idx})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Cancelar</button>`
+    }
   </div>`;
 }
 
@@ -1913,6 +2068,35 @@ function handleAdsData(json) {
   const defaultTo   = new Date().toISOString().slice(0, 10);
 
   renderRendimientoPanel(defaultFrom, defaultTo);
+}
+
+function renderCancelled(app) {
+  let cancelled = bookings.filter(b => b.otaCancelled === true);
+  if (currentTour !== 'all') cancelled = cancelled.filter(b => b.tour === currentTour);
+  cancelled.sort((a, b) => b.start.localeCompare(a.start));
+
+  if (cancelled.length === 0) {
+    app.innerHTML = '<div class="empty">No hay reservas canceladas</div>';
+    return;
+  }
+
+  let html = `<div class="section"><div class="section-title">Canceladas <span>${cancelled.length}</span></div>`;
+  cancelled.forEach(b => {
+    const srcColor = b.source === 'civitatis' ? '#2563eb' : b.source === 'guruwalk' ? '#e05252' : '#94a3b8';
+    html += `
+      <div class="card past cancelled" style="border-left:3px solid ${srcColor}">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:0.5rem;min-width:0">
+            ${sourceBadge(b)}
+            <span class="card-name" style="text-decoration:line-through;color:#94a3b8">${b.name}</span>
+          </div>
+          <span class="badge badge-cancelled">Cancelada</span>
+        </div>
+        <div class="card-meta">${tourName(b)} · ${b.people} persona${b.people>1?'s':''} · ${formatDate(b.start)}</div>
+      </div>`;
+  });
+  html += '</div>';
+  app.innerHTML = html;
 }
 
 function renderRendimientoPanel(fromDate, toDate) {
@@ -2046,7 +2230,51 @@ function render() {
   const app = document.getElementById('app');
   const banner = document.getElementById('today-banner');
 
-  let filtered = bookings.filter(b => !isDeleted(b));
+  let filtered;
+  if (currentFilter === 'cancelled') {
+    filtered = bookings.filter(b => b.otaCancelled === true);
+    if (currentTour !== 'all') filtered = filtered.filter(b => b.tour === currentTour);
+    // Ordenar por fecha de cancelación más reciente (b.booked)
+    filtered.sort((a, b) => (b.booked || '').localeCompare(a.booked || ''));
+    if (filtered.length === 0) {
+      app.innerHTML = '<div class="empty">No hay reservas canceladas</div>';
+      return;
+    }
+    let html = `<div class="section"><div class="section-title">Canceladas <span>${filtered.length}</span></div>`;
+    filtered.forEach(b => {
+      const srcColor = b.source === 'civitatis' ? '#2563eb' : b.source === 'guruwalk' ? '#e05252' : '#94a3b8';
+      const cancelDate = b.booked ? b.booked.slice(0,10) : '';
+      const [cy, cm, cd] = cancelDate ? cancelDate.split('-') : ['','',''];
+      const cancelLabel = cancelDate ? `${cd}/${cm}/${cy}` : '—';
+      html += `<div class="card past" style="border-left:3px solid ${srcColor};opacity:0.85">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:0.5rem;min-width:0;flex-wrap:wrap">
+            ${sourceBadge(b)}
+            <span class="badge" style="${tourBadgeStyle(b.tour)};font-size:0.68rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:4px">${tourLabel(b.tour)}</span>
+            <span class="card-name" style="text-decoration:line-through;color:#94a3b8">${b.name}</span>
+          </div>
+          <span class="badge badge-cancelled" style="flex-shrink:0">Cancelada</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem;margin-top:0.35rem;flex-wrap:wrap">
+          <span style="font-size:0.78rem;color:#64748b">📅 Tour: <b>${formatDate(b.start)}</b></span>
+          <span style="font-size:0.78rem;color:#e11d48">✕ Cancelada: <b>${cancelLabel}</b></span>
+          <span style="font-size:0.78rem;color:#94a3b8">${b.people} persona${b.people>1?'s':''}</span>
+          ${b.contactUrl ? (() => {
+            const bidx = bookings.indexOf(b);
+            const svgOut = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+            if (b.source === 'civitatis') return `<button onclick="openCivitatisContact('${b.name.replace(/'/g,"\\'")}','${b.contactUrl}')" style="font-size:0.75rem;font-weight:700;color:${srcColor};background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:0.25rem;padding:0">${svgOut} Ver en panel</button>`;
+            if (b.source === 'guruwalk') return `<button onclick="openGuruWalkCancelPopup(${bidx})" style="font-size:0.75rem;font-weight:700;color:${srcColor};background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:0.25rem;padding:0">${svgOut} Gestionar reserva</button>`;
+            return '';
+          })() : ''}
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+    app.innerHTML = html;
+    return;
+  }
+
+  filtered = bookings.filter(b => !isDeleted(b) && !isCancelled(b));
   if (currentTour !== 'all') filtered = filtered.filter(b => b.tour === currentTour);
   if (currentFilter === 'today') filtered = filtered.filter(b => getStatus(b.start) === 'today');
   else if (currentFilter === 'tomorrow') filtered = filtered.filter(b => b.start.slice(0,10) === tomorrowStr);
@@ -2715,9 +2943,32 @@ function openTasksPanel() {
     const srcLabel = b.source === 'civitatis' ? 'Civitatis' : b.source === 'guruwalk' ? 'Guruwalk' : 'Web';
     const svgWAicon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`;
     const svgLink = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
-    const primaryBtn = b.source === 'civitatis' && b.contactUrl
-      ? `<button onclick="openCivitatisContact('${b.name.replace(/'/g,"\\'")}','${b.contactUrl}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:0.35rem;background:#1a56db;color:white;border:none;border-radius:10px;padding:0.55rem 0.75rem;font-size:0.82rem;font-weight:700;cursor:pointer">${svgLink} Ver contacto</button>`
-      : `<button onclick="confirmViaWhatsApp(${idx},true)" style="flex:1;display:flex;align-items:center;justify-content:center;gap:0.35rem;background:#15803d;color:white;border:none;border-radius:10px;padding:0.55rem 0.75rem;font-size:0.82rem;font-weight:700;cursor:pointer">${svgWAicon} Confirmar por WA</button>`;
+    const btnStyle = 'flex:1;display:flex;align-items:center;justify-content:center;gap:0.35rem;border:none;border-radius:10px;padding:0.55rem 0.75rem;font-size:0.82rem;font-weight:700;cursor:pointer;text-decoration:none';
+    const safeName = b.name.replace(/'/g,"\\'");
+    const svgManual = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+    const svgX = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+    const btnManual = `<button onclick="openManualConfirm(${idx})" style="display:flex;align-items:center;gap:0.25rem;background:#f1f5f9;color:#475569;border:none;border-radius:10px;padding:0.55rem 0.65rem;font-size:0.78rem;font-weight:600;cursor:pointer;white-space:nowrap">${svgManual} Manual</button>`;
+    const cancelOnclick = b.source === 'civitatis' && b.contactUrl
+      ? `openCivitatisCancel('${safeName}','${b.contactUrl}')`
+      : b.source === 'guruwalk'
+      ? `openGuruWalkCancelPopup(${idx})`
+      : `closeTasksPanelDirect();openCancelPopup(${idx})`;
+    const btnCancel = `<button onclick="${cancelOnclick}" style="display:flex;align-items:center;justify-content:center;background:#fff1f2;color:#e11d48;border:none;border-radius:10px;padding:0.55rem 0.6rem;font-size:0.78rem;cursor:pointer" title="Cancelar">${svgX}</button>`;
+
+    let btnsHtml;
+    if (b.source === 'civitatis' && b.contactUrl) {
+      btnsHtml = `
+        <button onclick="openCivitatisConfirm('${safeName}','${b.contactUrl}')" style="${btnStyle};background:#1a56db;color:white">${svgLink} Confirmar reserva</button>
+        ${btnManual}${btnCancel}`;
+    } else if (b.source === 'guruwalk') {
+      btnsHtml = `
+        <button onclick="confirmViaWhatsApp(${idx},true)" style="${btnStyle};background:#15803d;color:white">${svgWAicon} Confirmar por WA</button>
+        ${btnManual}${btnCancel}`;
+    } else {
+      btnsHtml = `
+        <button onclick="confirmViaWhatsApp(${idx},true)" style="${btnStyle};background:#15803d;color:white">${svgWAicon} Confirmar por WA</button>
+        ${btnManual}${btnCancel}`;
+    }
     return `
     <div style="border:1px solid #e2e8f0;border-left:3px solid ${srcColor};border-radius:12px;padding:0.75rem;margin-bottom:0.5rem;background:white">
       <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.2rem">
@@ -2726,14 +2977,8 @@ function openTasksPanel() {
       </div>
       <div style="font-size:0.78rem;color:#64748b;margin-bottom:0.05rem">${tour} · ${fmtDate(b.start)}</div>
       <div style="font-size:0.72rem;color:#94a3b8;margin-bottom:0.65rem">${b.phone}${b.email ? ' · ' + b.email : ''}</div>
-      <div style="display:flex;align-items:center;gap:0.4rem">
-        ${primaryBtn}
-        <button onclick="openManualConfirm(${idx})" style="display:flex;align-items:center;gap:0.25rem;background:#f1f5f9;color:#475569;border:none;border-radius:10px;padding:0.55rem 0.65rem;font-size:0.78rem;font-weight:600;cursor:pointer;white-space:nowrap">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Manual
-        </button>
-        <button onclick="closeTasksPanelDirect();openCancelPopup(${idx})" style="display:flex;align-items:center;justify-content:center;background:#fff1f2;color:#e11d48;border:none;border-radius:10px;padding:0.55rem 0.6rem;font-size:0.78rem;cursor:pointer" title="Cancelar reserva">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+      <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap">
+        ${btnsHtml}
       </div>
     </div>`;
   }).join('');
@@ -3070,8 +3315,6 @@ const AUTH_KEY = 'cristitours_auth';
 const PIN = '1234';
 
 // --- Loading screen logic ---
-let _dataReady = false;
-let _minWaitDone = false;
 const SVG_CHECK = `<svg class="ld-check" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5 8.5 6.5 12.5 13.5 3.5"/></svg>`;
 
 function ldTick(iconId, barPct) {
@@ -3081,18 +3324,12 @@ function ldTick(iconId, barPct) {
   if (bar) bar.style.width = barPct + '%';
 }
 
-function onWebLoaded()  { ldTick('ld-web-icon', 33); }
-function onOTALoaded()  { ldTick('ld-civ-icon', 66); ldTick('ld-gw-icon', 100); }
+function onWebLoaded() { ldTick('ld-web-icon', 33); }
+function onOTALoaded() { ldTick('ld-civ-icon', 66); ldTick('ld-gw-icon', 100); }
 
-function onDataReady() {
-  if (_dataReady) return;
-  _dataReady = true;
-  onOTALoaded();
-  if (_minWaitDone) proceedAfterLoading();
-}
-
-function proceedAfterLoading() {
+function dismissLoadingScreen() {
   const screen = document.getElementById('loading-screen');
+  if (!screen || screen.style.display === 'none') return;
   screen.style.transition = 'opacity 0.35s';
   screen.style.opacity = '0';
   setTimeout(() => { screen.style.display = 'none'; screen.style.opacity = '1'; }, 350);
@@ -3104,12 +3341,16 @@ function proceedAfterLoading() {
   }
 }
 
+// Called when OTA finishes (success or error)
+function onDataReady() {
+  onOTALoaded();
+  dismissLoadingScreen();
+}
+
 function startLoadingScreen() {
   loadAll();
-  setTimeout(() => {
-    _minWaitDone = true;
-    if (_dataReady) proceedAfterLoading();
-  }, 1200);
+  // Fallback: si en 6s no llegaron datos OTA, mostrar la app igual
+  setTimeout(dismissLoadingScreen, 6000);
 }
 
 function authInput(digit) {
