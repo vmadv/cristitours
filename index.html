@@ -969,6 +969,7 @@
   <span style="color:#e2e8f0;font-size:1rem;line-height:1;align-self:center">|</span>
   <button id="opiniones-btn" class="filter-btn" data-group="time" data-val="opiniones" onclick="setFilter('opiniones')" style="color:#b0bac7;font-size:0.78rem">★ Opiniones</button>
   <button class="filter-btn" data-group="time" data-val="rendimiento" onclick="setFilter('rendimiento')" style="color:#b0bac7;font-size:0.78rem">📊 Rendimiento</button>
+  <button class="filter-btn" data-group="time" data-val="estimacion" onclick="setFilter('estimacion')" style="color:#b0bac7;font-size:0.78rem">📈 Estimación</button>
 </div>
 
 <div id="today-banner"></div>
@@ -2222,10 +2223,127 @@ function applyAdsFilter() {
   if (from && to && from <= to) renderRendimientoPanel(from, to);
 };
 
+function renderEstimacion() {
+  document.getElementById('today-banner').innerHTML = '';
+  document.getElementById('novedades').innerHTML = '';
+
+  const PRICE = 12;
+  const MESES_LARGO = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const MESES_CORTO = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+
+  // Calcular lunes de una fecha usando aritmética local (sin toISOString para evitar desfase UTC)
+  function getLunesStr(dateStr) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dt = new Date(y, m - 1, d);
+    const dow = dt.getDay(); // 0=dom, 1=lun...
+    dt.setDate(dt.getDate() + (dow === 0 ? -6 : 1 - dow));
+    return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+  }
+
+  function dateToStr(dt) {
+    return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+  }
+
+  // Reservas futuras activas (hoy + futuras, sin cancelar, sin borrar)
+  const futuras = bookings.filter(b => {
+    if (isDeleted(b) || isCancelled(b)) return false;
+    const d = b.start.slice(0, 10);
+    return d >= todayStr;
+  });
+
+  // Agrupar por semana
+  const porSemana = {};
+  futuras.forEach(b => {
+    const lunes = getLunesStr(b.start.slice(0, 10));
+    if (!porSemana[lunes]) porSemana[lunes] = { personas: 0, reservas: 0 };
+    porSemana[lunes].personas += (b.people || 1);
+    porSemana[lunes].reservas++;
+  });
+
+  // Generar todas las semanas desde hoy hasta +6 meses
+  const hoy = new Date();
+  const hoyStr = dateToStr(hoy);
+  const lunes0 = new Date(hoy);
+  const dow0 = hoy.getDay();
+  lunes0.setDate(lunes0.getDate() + (dow0 === 0 ? -6 : 1 - dow0));
+  const fin = new Date(hoy);
+  fin.setMonth(fin.getMonth() + 6);
+
+  const semanas = [];
+  const cur = new Date(lunes0);
+  while (cur <= fin) {
+    const lunesStr = dateToStr(cur);
+    const dom = new Date(cur);
+    dom.setDate(dom.getDate() + 6);
+    const domingoStr = dateToStr(dom);
+    semanas.push({ lunes: lunesStr, domingo: domingoStr, ...(porSemana[lunesStr] || { personas: 0, reservas: 0 }) });
+    cur.setDate(cur.getDate() + 7);
+  }
+
+  // Agrupar semanas por mes (del lunes)
+  const porMes = {};
+  semanas.forEach(s => {
+    const [y, m] = s.lunes.split('-');
+    const key = `${y}-${m}`;
+    if (!porMes[key]) porMes[key] = { year: +y, mes: +m - 1, semanas: [] };
+    porMes[key].semanas.push(s);
+  });
+
+  let html = `<div style="padding:1rem">`;
+
+  Object.keys(porMes).sort().forEach(key => {
+    const { year, mes, semanas: semanasDelMes } = porMes[key];
+    const mesPersonas = semanasDelMes.reduce((acc, s) => acc + s.personas, 0);
+    const mesIngresos = mesPersonas * PRICE;
+
+    // Cabecera del mes como tarjeta resumen
+    html += `<div style="margin-bottom:1.25rem">
+      <div style="background:${mesIngresos > 0 ? 'linear-gradient(135deg,#1a56db,#1e40af)' : '#f1f5f9'};border-radius:14px;padding:1rem 1.25rem;margin-bottom:0.6rem;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${mesIngresos > 0 ? 'rgba(255,255,255,0.75)' : '#94a3b8'};margin-bottom:0.25rem">${MESES_LARGO[mes]} ${year}</div>
+          <div style="font-size:1.5rem;font-weight:800;color:${mesIngresos > 0 ? 'white' : '#cbd5e1'};line-height:1">${mesIngresos > 0 ? mesIngresos.toLocaleString('es-ES') + ' €' : '—'}</div>
+        </div>
+        ${mesPersonas > 0 ? `<div style="text-align:right">
+          <div style="font-size:1.75rem;font-weight:800;color:white;line-height:1">${mesPersonas}</div>
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.7);margin-top:0.2rem">personas</div>
+        </div>` : ''}
+      </div>`;
+
+    semanasDelMes.forEach(s => {
+      const [, lm, ld] = s.lunes.split('-');
+      const [, dm, dd] = s.domingo.split('-');
+      const label = `${+ld} ${MESES_CORTO[+lm-1]} — ${+dd} ${MESES_CORTO[+dm-1]}`;
+      const ingresos = s.personas * PRICE;
+      const hayDatos = s.personas > 0;
+
+      html += `<div style="background:white;border-radius:10px;padding:0.75rem 1rem;margin-bottom:0.4rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.05);border-left:3px solid ${hayDatos ? '#1a56db' : '#e2e8f0'}">
+        <div>
+          <div style="font-size:0.83rem;font-weight:600;color:${hayDatos ? '#1a202c' : '#94a3b8'}">${label}</div>
+          <div style="font-size:0.72rem;margin-top:0.15rem;color:${hayDatos ? '#64748b' : '#cbd5e1'}">
+            ${hayDatos ? `${s.reservas} reserva${s.reservas !== 1 ? 's' : ''} · ${s.personas} persona${s.personas !== 1 ? 's' : ''}` : 'Sin reservas aún'}
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:1rem">
+          ${hayDatos
+            ? `<div style="font-size:1rem;font-weight:800;color:#1d4ed8">${ingresos.toLocaleString('es-ES')} €</div>
+               <div style="font-size:0.65rem;color:#94a3b8">${s.personas} × ${PRICE} €</div>`
+            : `<div style="font-size:0.875rem;font-weight:600;color:#e2e8f0">0 €</div>`}
+        </div>
+      </div>`;
+    });
+
+    html += `</div>`;
+  });
+
+  html += `</div>`;
+  document.getElementById('app').innerHTML = html;
+}
+
 function render() {
   if (currentFilter === 'calendar') { renderCalendar(); return; }
   if (currentFilter === 'opiniones') { renderOpiniones(); return; }
   if (currentFilter === 'rendimiento') { renderRendimiento(); return; }
+  if (currentFilter === 'estimacion') { renderEstimacion(); return; }
 
   const app = document.getElementById('app');
   const banner = document.getElementById('today-banner');
