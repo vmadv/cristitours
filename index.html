@@ -2321,7 +2321,7 @@ function renderEstimacion() {
         if (dispEnd >= todayStr) {
           const countFrom = dispStart < todayStr ? todayStr : dispStart;
           const { personas, reservas } = countRange(countFrom, dispEnd);
-          semanas.push({ dispStart, dispEnd, personas, reservas });
+          semanas.push({ dispStart: countFrom, dispEnd, personas, reservas });
         }
         cur.setDate(cur.getDate() + 7);
       }
