@@ -961,6 +961,7 @@
 
 <div class="filter-bar">
   <button class="filter-btn active" data-group="time" data-val="all" onclick="setFilter('all')">Todas</button>
+  <button class="filter-btn" data-group="time" data-val="tours" onclick="setFilter('tours')">🗓 Tours</button>
   <button class="filter-btn" data-group="time" data-val="today" onclick="setFilter('today')">Hoy</button>
   <button class="filter-btn" data-group="time" data-val="tomorrow" onclick="setFilter('tomorrow')">Mañana</button>
   <button class="filter-btn" data-group="time" data-val="calendar" onclick="setFilter('calendar')">Calendario</button>
@@ -2484,8 +2485,117 @@ function renderEstimacion() {
   document.getElementById('app').innerHTML = html;
 }
 
+function renderTours() {
+  document.getElementById('today-banner').innerHTML = '';
+
+  const upcoming = bookings.filter(b =>
+    !isDeleted(b) && !isCancelled(b) && b.start.slice(0, 10) >= todayStr
+  );
+
+  const byDate = {};
+  upcoming.forEach(b => {
+    const d = b.start.slice(0, 10);
+    if (!byDate[d]) byDate[d] = [];
+    byDate[d].push(b);
+  });
+
+  const dates = Object.keys(byDate).sort();
+
+  if (dates.length === 0) {
+    document.getElementById('app').innerHTML = '<div class="empty">Sin tours próximos</div>';
+    return;
+  }
+
+  const DAYS   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+  const TOUR_GROUPS = [
+    { label: 'Free Tour Las Palmas',   tours: ['centro','portugues'], gradient: 'linear-gradient(135deg,#1a56db,#1e40af)', chipBg: 'rgba(255,255,255,0.2)' },
+    { label: 'Free Tour Las Canteras', tours: ['canteras'],           gradient: 'linear-gradient(135deg,#059669,#047857)', chipBg: 'rgba(255,255,255,0.2)' },
+  ];
+
+  let html = '';
+
+  dates.forEach(dateStr => {
+    const dayBookings = byDate[dateStr];
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dt = new Date(y, m - 1, d);
+    const isToday = dateStr === todayStr;
+    const weekday = isToday ? 'HOY' : DAYS[dt.getDay()].toUpperCase();
+    const dateLabel = `${d} de ${MONTHS[m - 1]}`;
+
+    html += `<div style="margin-bottom:2rem">
+      <div style="padding:0 1rem;margin-bottom:0.75rem;display:flex;align-items:baseline;gap:0.5rem">
+        <span style="font-size:0.75rem;font-weight:800;letter-spacing:1.5px;color:${isToday ? '#1a56db' : '#475569'}">${weekday}</span>
+        <span style="font-size:0.875rem;font-weight:500;color:${isToday ? '#3b82f6' : '#94a3b8'}">${dateLabel}</span>
+      </div>`;
+
+    const sortedGroups = [...TOUR_GROUPS].sort((a, b) => {
+      const timeA = dayBookings.filter(x => a.tours.includes(x.tour)).map(x => x.start.slice(11,16)).filter(Boolean).sort()[0] || '99:99';
+      const timeB = dayBookings.filter(x => b.tours.includes(x.tour)).map(x => x.start.slice(11,16)).filter(Boolean).sort()[0] || '99:99';
+      return timeA.localeCompare(timeB);
+    });
+
+    sortedGroups.forEach(group => {
+      const gb = dayBookings.filter(b => group.tours.includes(b.tour));
+      const totalPeople   = gb.reduce((s, b) => s + (b.people || 1), 0);
+      const totalReservas = gb.length;
+      const times = [...new Set(gb.map(b => b.start.slice(11, 16)).filter(Boolean))].sort();
+      const timeStr = times.join(' · ');
+      const hay = totalReservas > 0;
+      if (!hay) return;
+
+      const statusGradient = totalPeople === 1
+        ? 'linear-gradient(135deg,#dc2626,#b91c1c)'
+        : totalPeople <= 3
+          ? 'linear-gradient(135deg,#ea580c,#c2410c)'
+          : 'linear-gradient(135deg,#059669,#047857)';
+      const statusEmoji = totalPeople === 1 ? '😬' : totalPeople <= 3 ? '🤞' : '🎉';
+      const statusLabel = totalPeople === 1 ? 'Complicado' : totalPeople <= 3 ? 'Ahí ahí' : '¡Perfecto!';
+
+      // Lista de personas
+      let peopleRows = '';
+      gb.forEach((b, i) => {
+        const hasContact = b.phone || b.email;
+        peopleRows += `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:0.625rem 1.25rem;${i > 0 ? 'border-top:1px solid #f1f5f9' : ''}">
+          <div style="min-width:0">
+            <div style="font-size:0.9rem;font-weight:700;color:#1a202c">${b.name}</div>
+            ${b.phone ? `<div style="font-size:0.78rem;color:#475569;margin-top:0.1rem">${b.phone}</div>` : ''}
+            ${b.email ? `<div style="font-size:0.75rem;color:#94a3b8;margin-top:0.05rem">${b.email}</div>` : ''}
+            ${!hasContact ? `<div style="font-size:0.75rem;color:#cbd5e1;margin-top:0.1rem">Sin contacto</div>` : ''}
+          </div>
+          <div style="flex-shrink:0;background:#f1f5f9;border-radius:8px;padding:0.25rem 0.6rem;text-align:center;margin-top:0.1rem">
+            <div style="font-size:1rem;font-weight:800;color:#1a202c;line-height:1">${b.people}</div>
+            <div style="font-size:0.6rem;color:#64748b;letter-spacing:0.3px">pers.</div>
+          </div>
+        </div>`;
+      });
+
+      html += `<div style="margin:0 1rem 0.75rem;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.10)">
+        <div style="background:${statusGradient};padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem">
+          <div>
+            <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.7);margin-bottom:0.2rem">${timeStr || '—'}</div>
+            <div style="font-size:1rem;font-weight:800;color:white;line-height:1.2">${group.label}</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.7);margin-top:0.25rem">${totalReservas} reserva${totalReservas !== 1 ? 's' : ''}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:2.75rem;font-weight:900;color:white;line-height:1">${totalPeople}</div>
+            <div style="font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.9);margin-top:0.1rem">${statusEmoji} ${statusLabel}</div>
+          </div>
+        </div>
+        <div style="background:white">${peopleRows}</div>
+      </div>`;
+    });
+
+    html += '</div>';
+  });
+
+  document.getElementById('app').innerHTML = html;
+}
+
 function render() {
   if (currentFilter === 'calendar') { renderCalendar(); return; }
+  if (currentFilter === 'tours')     { renderTours();    return; }
   if (currentFilter === 'opiniones') { renderOpiniones(); return; }
   if (currentFilter === 'rendimiento') { renderRendimiento(); return; }
   if (currentFilter === 'estimacion') { renderEstimacion(); return; }
