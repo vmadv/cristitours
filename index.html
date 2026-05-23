@@ -2223,19 +2223,27 @@ function applyAdsFilter() {
   if (from && to && from <= to) renderRendimientoPanel(from, to);
 };
 
+let estimacionVista = 'proximas';
+
+function setEstimacionVista(v) {
+  estimacionVista = v;
+  renderEstimacion();
+}
+
 function renderEstimacion() {
   document.getElementById('today-banner').innerHTML = '';
   document.getElementById('novedades').innerHTML = '';
 
   const PRICE = 12;
+  const HIST_FROM = '2026-04';
   const MESES_LARGO = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const MESES_CORTO = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const currentMonthKey = todayStr.slice(0, 7);
 
-  // Calcular lunes de una fecha usando aritmética local (sin toISOString para evitar desfase UTC)
   function getLunesStr(dateStr) {
     const [y, m, d] = dateStr.split('-').map(Number);
     const dt = new Date(y, m - 1, d);
-    const dow = dt.getDay(); // 0=dom, 1=lun...
+    const dow = dt.getDay();
     dt.setDate(dt.getDate() + (dow === 0 ? -6 : 1 - dow));
     return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
   }
@@ -2244,96 +2252,233 @@ function renderEstimacion() {
     return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
   }
 
-  // Reservas futuras activas (hoy + futuras, sin cancelar, sin borrar)
-  const futuras = bookings.filter(b => {
-    if (isDeleted(b) || isCancelled(b)) return false;
-    const d = b.start.slice(0, 10);
-    return d >= todayStr;
-  });
+  // Toggle
+  const toggleHtml = `<div style="display:flex;gap:0;background:#f1f5f9;border-radius:10px;padding:3px;margin-bottom:1.25rem">
+    <button onclick="setEstimacionVista('proximas')" style="flex:1;padding:0.5rem 0.75rem;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;background:${estimacionVista==='proximas'?'white':'transparent'};color:${estimacionVista==='proximas'?'#1a56db':'#94a3b8'};box-shadow:${estimacionVista==='proximas'?'0 1px 4px rgba(0,0,0,0.1)':'none'}">📈 Próximas</button>
+    <button onclick="setEstimacionVista('historico')" style="flex:1;padding:0.5rem 0.75rem;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;background:${estimacionVista==='historico'?'white':'transparent'};color:${estimacionVista==='historico'?'#0d9488':'#94a3b8'};box-shadow:${estimacionVista==='historico'?'0 1px 4px rgba(0,0,0,0.1)':'none'}">📊 Histórico</button>
+  </div>`;
 
-  // Agrupar por semana
-  const porSemana = {};
-  futuras.forEach(b => {
-    const lunes = getLunesStr(b.start.slice(0, 10));
-    if (!porSemana[lunes]) porSemana[lunes] = { personas: 0, reservas: 0 };
-    porSemana[lunes].personas += (b.people || 1);
-    porSemana[lunes].reservas++;
-  });
+  let html = `<div style="padding:1rem">${toggleHtml}`;
 
-  // Generar todas las semanas desde hoy hasta +6 meses
-  const hoy = new Date();
-  const hoyStr = dateToStr(hoy);
-  const lunes0 = new Date(hoy);
-  const dow0 = hoy.getDay();
-  lunes0.setDate(lunes0.getDate() + (dow0 === 0 ? -6 : 1 - dow0));
-  const fin = new Date(hoy);
-  fin.setMonth(fin.getMonth() + 6);
+  if (estimacionVista === 'proximas') {
+    // ── VISTA PRÓXIMAS ──
+    const futuras = bookings.filter(b => {
+      if (isDeleted(b) || isCancelled(b)) return false;
+      return b.start.slice(0, 10) >= todayStr;
+    });
 
-  const semanas = [];
-  const cur = new Date(lunes0);
-  while (cur <= fin) {
-    const lunesStr = dateToStr(cur);
-    const dom = new Date(cur);
-    dom.setDate(dom.getDate() + 6);
-    const domingoStr = dateToStr(dom);
-    semanas.push({ lunes: lunesStr, domingo: domingoStr, ...(porSemana[lunesStr] || { personas: 0, reservas: 0 }) });
-    cur.setDate(cur.getDate() + 7);
-  }
+    // Índice por día para buscar rápido
+    const porDia = {};
+    futuras.forEach(b => {
+      const d = b.start.slice(0, 10);
+      if (!porDia[d]) porDia[d] = { personas: 0, reservas: 0 };
+      porDia[d].personas += (b.people || 1);
+      porDia[d].reservas++;
+    });
 
-  // Agrupar semanas por mes (del lunes)
-  const porMes = {};
-  semanas.forEach(s => {
-    const [y, m] = s.lunes.split('-');
-    const key = `${y}-${m}`;
-    if (!porMes[key]) porMes[key] = { year: +y, mes: +m - 1, semanas: [] };
-    porMes[key].semanas.push(s);
-  });
+    function countRange(from, to) {
+      let personas = 0, reservas = 0;
+      const [fy,fm,fd] = from.split('-').map(Number);
+      const [ty,tm,td] = to.split('-').map(Number);
+      const cur = new Date(fy, fm-1, fd);
+      const end = new Date(ty, tm-1, td);
+      while (cur <= end) {
+        const ds = dateToStr(cur);
+        if (porDia[ds]) { personas += porDia[ds].personas; reservas += porDia[ds].reservas; }
+        cur.setDate(cur.getDate() + 1);
+      }
+      return { personas, reservas };
+    }
 
-  let html = `<div style="padding:1rem">`;
+    // Generar meses y semanas clipadas al mes
+    const hoy = new Date();
+    const porMes = {};
+    for (let i = 0; i < 7; i++) {
+      const dt = new Date(hoy.getFullYear(), hoy.getMonth() + i, 1);
+      const y = dt.getFullYear(), m = dt.getMonth();
+      const mk = `${y}-${String(m+1).padStart(2,'0')}`;
+      const firstDayStr = `${y}-${String(m+1).padStart(2,'0')}-01`;
+      const lastDayNum  = new Date(y, m+1, 0).getDate();
+      const lastDayStr  = `${y}-${String(m+1).padStart(2,'0')}-${String(lastDayNum).padStart(2,'0')}`;
 
-  Object.keys(porMes).sort().forEach(key => {
-    const { year, mes, semanas: semanasDelMes } = porMes[key];
-    const mesPersonas = semanasDelMes.reduce((acc, s) => acc + s.personas, 0);
-    const mesIngresos = mesPersonas * PRICE;
+      if (lastDayStr < todayStr) continue;
 
-    // Cabecera del mes como tarjeta resumen
-    html += `<div style="margin-bottom:1.25rem">
-      <div style="background:${mesIngresos > 0 ? 'linear-gradient(135deg,#1a56db,#1e40af)' : '#f1f5f9'};border-radius:14px;padding:1rem 1.25rem;margin-bottom:0.6rem;display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${mesIngresos > 0 ? 'rgba(255,255,255,0.75)' : '#94a3b8'};margin-bottom:0.25rem">${MESES_LARGO[mes]} ${year}</div>
-          <div style="font-size:1.5rem;font-weight:800;color:${mesIngresos > 0 ? 'white' : '#cbd5e1'};line-height:1">${mesIngresos > 0 ? mesIngresos.toLocaleString('es-ES') + ' €' : '—'}</div>
-        </div>
-        ${mesPersonas > 0 ? `<div style="text-align:right">
-          <div style="font-size:1.75rem;font-weight:800;color:white;line-height:1">${mesPersonas}</div>
-          <div style="font-size:0.7rem;color:rgba(255,255,255,0.7);margin-top:0.2rem">personas</div>
-        </div>` : ''}
-      </div>`;
+      const semanas = [];
+      const firstDt = new Date(y, m, 1);
+      const fdow = firstDt.getDay();
+      const cur = new Date(firstDt);
+      cur.setDate(firstDt.getDate() - (fdow === 0 ? 6 : fdow - 1));
 
-    semanasDelMes.forEach(s => {
-      const [, lm, ld] = s.lunes.split('-');
-      const [, dm, dd] = s.domingo.split('-');
-      const label = `${+ld} ${MESES_CORTO[+lm-1]} — ${+dd} ${MESES_CORTO[+dm-1]}`;
-      const ingresos = s.personas * PRICE;
-      const hayDatos = s.personas > 0;
+      while (true) {
+        const wEnd = new Date(cur); wEnd.setDate(wEnd.getDate() + 6);
+        const wStartStr = dateToStr(cur);
+        const wEndStr   = dateToStr(wEnd);
+        if (wStartStr > lastDayStr) break;
 
-      html += `<div style="background:white;border-radius:10px;padding:0.75rem 1rem;margin-bottom:0.4rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.05);border-left:3px solid ${hayDatos ? '#1a56db' : '#e2e8f0'}">
-        <div>
-          <div style="font-size:0.83rem;font-weight:600;color:${hayDatos ? '#1a202c' : '#94a3b8'}">${label}</div>
-          <div style="font-size:0.72rem;margin-top:0.15rem;color:${hayDatos ? '#64748b' : '#cbd5e1'}">
-            ${hayDatos ? `${s.reservas} reserva${s.reservas !== 1 ? 's' : ''} · ${s.personas} persona${s.personas !== 1 ? 's' : ''}` : 'Sin reservas aún'}
+        const dispStart = wStartStr < firstDayStr ? firstDayStr : wStartStr;
+        const dispEnd   = wEndStr   > lastDayStr  ? lastDayStr  : wEndStr;
+
+        if (dispEnd >= todayStr) {
+          const countFrom = dispStart < todayStr ? todayStr : dispStart;
+          const { personas, reservas } = countRange(countFrom, dispEnd);
+          semanas.push({ dispStart, dispEnd, personas, reservas });
+        }
+        cur.setDate(cur.getDate() + 7);
+      }
+
+      if (semanas.length > 0) porMes[mk] = { year: y, mes: m, semanas };
+    }
+
+    Object.keys(porMes).sort().forEach(key => {
+      const { year, mes, semanas: sw } = porMes[key];
+      const mesPersonas = sw.reduce((a, s) => a + s.personas, 0);
+      const mesIngresos = mesPersonas * PRICE;
+      const bgColor = mesPersonas > 0 ? 'linear-gradient(135deg,#1a56db,#1e40af)' : '#f1f5f9';
+      const txtColor = mesPersonas > 0 ? 'white' : '#cbd5e1';
+      const subColor = mesPersonas > 0 ? 'rgba(255,255,255,0.75)' : '#94a3b8';
+
+      html += `<div style="margin-bottom:1.25rem">
+        <div style="background:${bgColor};border-radius:14px;padding:1rem 1.25rem;margin-bottom:0.6rem;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${subColor};margin-bottom:0.25rem">${MESES_LARGO[mes]} ${year}</div>
+            <div style="font-size:1.5rem;font-weight:800;color:${txtColor};line-height:1">${mesPersonas > 0 ? mesIngresos.toLocaleString('es-ES') + ' €' : '—'}</div>
           </div>
+          ${mesPersonas > 0 ? `<div style="text-align:right"><div style="font-size:1.75rem;font-weight:800;color:white;line-height:1">${mesPersonas}</div><div style="font-size:0.7rem;color:rgba(255,255,255,0.7);margin-top:0.2rem">personas</div></div>` : ''}
         </div>
-        <div style="text-align:right;flex-shrink:0;margin-left:1rem">
-          ${hayDatos
-            ? `<div style="font-size:1rem;font-weight:800;color:#1d4ed8">${ingresos.toLocaleString('es-ES')} €</div>
-               <div style="font-size:0.65rem;color:#94a3b8">${s.personas} × ${PRICE} €</div>`
-            : `<div style="font-size:0.875rem;font-weight:600;color:#e2e8f0">0 €</div>`}
-        </div>
+        ${sw.map(s => {
+          const ingresos = s.personas * PRICE;
+          const hay = s.personas > 0;
+          const [,sm,sd] = s.dispStart.split('-');
+          const [,em,ed] = s.dispEnd.split('-');
+          return `<div style="background:white;border-radius:10px;padding:0.75rem 1rem;margin-bottom:0.4rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.05);border-left:3px solid ${hay ? '#1a56db' : '#e2e8f0'}">
+            <div>
+              <div style="font-size:0.83rem;font-weight:600;color:${hay ? '#1a202c' : '#94a3b8'}">${+sd} ${MESES_CORTO[+sm-1]} — ${+ed} ${MESES_CORTO[+em-1]}</div>
+              <div style="font-size:0.72rem;margin-top:0.15rem;color:${hay ? '#64748b' : '#cbd5e1'}">${hay ? `${s.reservas} reserva${s.reservas!==1?'s':''} · ${s.personas} persona${s.personas!==1?'s':''}` : 'Sin reservas aún'}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;margin-left:1rem">
+              ${hay ? `<div style="font-size:1rem;font-weight:800;color:#1d4ed8">${ingresos.toLocaleString('es-ES')} €</div><div style="font-size:0.65rem;color:#94a3b8">${s.personas} × ${PRICE} €</div>` : `<div style="font-size:0.875rem;font-weight:600;color:#e2e8f0">0 €</div>`}
+            </div>
+          </div>`;
+        }).join('')}
       </div>`;
     });
 
-    html += `</div>`;
-  });
+  } else {
+    // ── VISTA HISTÓRICO ──
+    // Reservas desde abril (pasadas + mes actual completo)
+    const relevantes = bookings.filter(b => {
+      if (isDeleted(b) || isCancelled(b)) return false;
+      const mk = b.start.slice(0, 7);
+      return mk >= HIST_FROM && mk <= currentMonthKey;
+    });
+
+    // Agrupar por mes → semana (del lunes que pertenece al mes del tour, no al de la semana)
+    const porMes = {};
+    relevantes.forEach(b => {
+      const dateStr = b.start.slice(0, 10);
+      const mk = dateStr.slice(0, 7);
+      const [my, mm] = mk.split('-').map(Number);
+      const lunes = getLunesStr(dateStr);
+      const plat = b.source === 'civitatis' ? 'civitatis' : b.source === 'guruwalk' ? 'guruwalk' : 'web';
+
+      if (!porMes[mk]) porMes[mk] = {
+        year: my, mes: mm - 1,
+        semanas: {},
+        plataformas: { web: 0, civitatis: 0, guruwalk: 0 },
+        esMesActual: mk === currentMonthKey
+      };
+      porMes[mk].plataformas[plat] += (b.people || 1);
+      if (!porMes[mk].semanas[lunes]) porMes[mk].semanas[lunes] = { personas: 0, reservas: 0 };
+      porMes[mk].semanas[lunes].personas += (b.people || 1);
+      porMes[mk].semanas[lunes].reservas++;
+    });
+
+    if (Object.keys(porMes).length === 0) {
+      html += `<div style="text-align:center;padding:2rem;color:#94a3b8;font-size:0.875rem">Sin datos desde abril</div>`;
+    } else {
+      Object.keys(porMes).sort().reverse().forEach(mk => {
+        const { year, mes, semanas, plataformas, esMesActual } = porMes[mk];
+        const mesPersonas = Object.values(plataformas).reduce((a, v) => a + v, 0);
+        const mesIngresos = mesPersonas * PRICE;
+
+        // Colores del mes
+        const bgColor = esMesActual
+          ? (mesPersonas > 0 ? 'linear-gradient(135deg,#7c3aed,#5b21b6)' : '#f1f5f9')
+          : (mesPersonas > 0 ? 'linear-gradient(135deg,#0d9488,#0f766e)' : '#f1f5f9');
+        const accentBorder = esMesActual ? '#7c3aed' : '#0d9488';
+        const accentMoney  = esMesActual ? '#7c3aed' : '#0f766e';
+
+        // Desglose por plataforma
+        const plats = [
+          { key: 'web',       label: 'WEB' },
+          { key: 'civitatis', label: 'Civitatis' },
+          { key: 'guruwalk',  label: 'Guruwalk' }
+        ].filter(p => plataformas[p.key] > 0);
+
+        const platHtml = plats.length > 1 ? `
+          <div style="border-top:1px solid rgba(255,255,255,0.15);margin-top:0.75rem;padding-top:0.65rem;display:flex;flex-direction:column;gap:0.35rem">
+            ${plats.map(p => {
+              const pct = Math.round(plataformas[p.key] / mesPersonas * 100);
+              const pEur = plataformas[p.key] * PRICE;
+              return `<div style="display:flex;align-items:center;gap:0.5rem">
+                <span style="font-size:0.6rem;font-weight:700;background:rgba(255,255,255,0.18);color:white;padding:0.1rem 0.4rem;border-radius:4px;min-width:58px;text-align:center;flex-shrink:0">${p.label}</span>
+                <div style="flex:1;background:rgba(255,255,255,0.15);border-radius:99px;height:3px">
+                  <div style="width:${pct}%;background:white;opacity:0.85;border-radius:99px;height:100%"></div>
+                </div>
+                <span style="font-size:0.68rem;color:rgba(255,255,255,0.85);font-weight:700;min-width:30px;text-align:right">${pct}%</span>
+                <span style="font-size:0.68rem;color:rgba(255,255,255,0.65);min-width:42px;text-align:right">${pEur.toLocaleString('es-ES')} €</span>
+              </div>`;
+            }).join('')}
+          </div>` : '';
+
+        // Semanas (clipeadas al mes)
+        const firstDayStr = `${year}-${String(mes+1).padStart(2,'0')}-01`;
+        const lastDayNum  = new Date(year, mes + 1, 0).getDate();
+        const lastDayStr  = `${year}-${String(mes+1).padStart(2,'0')}-${String(lastDayNum).padStart(2,'0')}`;
+
+        const semanasOrdenadas = Object.keys(semanas).sort();
+        const semanasHtml = semanasOrdenadas.map(lunes => {
+          const { personas, reservas } = semanas[lunes];
+          const displayStart = lunes < firstDayStr ? firstDayStr : lunes;
+          const lunesDt = new Date(...lunes.split('-').map((v,i) => i===1 ? +v-1 : +v));
+          lunesDt.setDate(lunesDt.getDate() + 6);
+          const sundayStr   = dateToStr(lunesDt);
+          const displayEnd  = sundayStr > lastDayStr ? lastDayStr : sundayStr;
+          const [,dsm,dsd]  = displayStart.split('-');
+          const [,dem,ded]  = displayEnd.split('-');
+          const label = `${+dsd} ${MESES_CORTO[+dsm-1]} — ${+ded} ${MESES_CORTO[+dem-1]}`;
+          const ingresos = personas * PRICE;
+          return `<div style="background:white;border-radius:10px;padding:0.75rem 1rem;margin-bottom:0.4rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.05);border-left:3px solid ${accentBorder}">
+            <div>
+              <div style="font-size:0.83rem;font-weight:600;color:#1a202c">${label}</div>
+              <div style="font-size:0.72rem;margin-top:0.15rem;color:#64748b">${reservas} reserva${reservas!==1?'s':''} · ${personas} persona${personas!==1?'s':''}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;margin-left:1rem">
+              <div style="font-size:1rem;font-weight:800;color:${accentMoney}">${ingresos.toLocaleString('es-ES')} €</div>
+              <div style="font-size:0.65rem;color:#94a3b8">${personas} × ${PRICE} €</div>
+            </div>
+          </div>`;
+        }).join('');
+
+        html += `<div style="margin-bottom:1.25rem">
+          <div style="background:${bgColor};border-radius:14px;padding:1rem 1.25rem;margin-bottom:0.6rem">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.2rem">
+                  <span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${mesPersonas>0?'rgba(255,255,255,0.75)':'#94a3b8'}">${MESES_LARGO[mes]} ${year}</span>
+                  ${esMesActual ? `<span style="font-size:0.6rem;font-weight:700;background:rgba(255,255,255,0.2);color:white;padding:0.1rem 0.45rem;border-radius:99px">EN CURSO</span>` : ''}
+                </div>
+                <div style="font-size:1.5rem;font-weight:800;color:${mesPersonas>0?'white':'#cbd5e1'};line-height:1">${mesPersonas>0?mesIngresos.toLocaleString('es-ES')+' €':'—'}</div>
+              </div>
+              ${mesPersonas>0?`<div style="text-align:right"><div style="font-size:1.75rem;font-weight:800;color:white;line-height:1">${mesPersonas}</div><div style="font-size:0.7rem;color:rgba(255,255,255,0.7);margin-top:0.2rem">personas</div></div>`:''}
+            </div>
+            ${platHtml}
+          </div>
+          ${semanasHtml}
+        </div>`;
+      });
+    }
+  }
 
   html += `</div>`;
   document.getElementById('app').innerHTML = html;
