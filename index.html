@@ -798,9 +798,14 @@
 
 <!-- Cambiar hora -->
 <div id="timepick-overlay" onclick="closeTimePick(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1010;align-items:flex-end;justify-content:center">
-  <div id="timepick-sheet" onclick="event.stopPropagation()" style="background:white;border-radius:20px 20px 0 0;padding:1.25rem 1.25rem 2.5rem;width:100%;max-width:480px;box-shadow:0 -4px 24px rgba(0,0,0,0.12)">
-    <div style="width:36px;height:4px;border-radius:99px;background:#e2e8f0;margin:0 auto 1.25rem"></div>
-    <div id="timepick-content"></div>
+  <div id="timepick-sheet" onclick="event.stopPropagation()" style="background:white;border-radius:20px 20px 0 0;width:100%;max-width:480px;box-shadow:0 -4px 24px rgba(0,0,0,0.12);max-height:85vh;display:flex;flex-direction:column">
+    <div style="padding:1rem 1.25rem 0;flex-shrink:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <div style="width:36px;height:4px;border-radius:99px;background:#e2e8f0;margin:0 auto"></div>
+        <button onclick="closeTimePick()" style="position:absolute;right:1.25rem;background:none;border:none;font-size:1.3rem;color:#94a3b8;cursor:pointer;line-height:1;padding:0.2rem">✕</button>
+      </div>
+    </div>
+    <div id="timepick-content" style="overflow-y:auto;padding:0 1.25rem 2.5rem;flex:1"></div>
   </div>
 </div>
 
@@ -2543,7 +2548,7 @@ function render() {
           <div class="card-date">${iconCalendar()} ${formatDate(b.start)}</div>
           <div class="card-meta">
             <span class="meta-item">${b.phone}</span>
-            <span class="meta-item" style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:bottom;cursor:pointer" title="${b.email}" onclick="this.style.whiteSpace=this.style.whiteSpace==='normal'?'nowrap':'normal';this.style.overflow=this.style.overflow==='visible'?'hidden':'visible'">${b.email}</span>
+            ${b.email ? `<span class="meta-item" style="max-width:160px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:block" title="${b.email}" onclick="this.style.whiteSpace=this.style.whiteSpace==='normal'?'nowrap':'normal';this.style.overflow=this.style.overflow==='visible'?'hidden':'visible'">${b.email}</span>` : ''}
           </div>
           <div class="card-footer" style="flex-wrap:wrap;gap:0.5rem">
             <div class="people-badge">${iconPeople()} ${b.people} persona${b.people > 1 ? 's' : ''}</div>
@@ -3141,6 +3146,9 @@ function getTimeOverride(b) {
 
 function applyTimeOverrides() {
   bookings.forEach(b => {
+    if (b._origStart === undefined) { b._origStart = b.start; b._origTour = b.tour; }
+    b.start = b._origStart;
+    b.tour  = b._origTour;
     const ov = getTimeOverride(b);
     if (ov) {
       if (ov.start) b.start = ov.start;
@@ -3149,38 +3157,70 @@ function applyTimeOverrides() {
   });
 }
 
+function startRemotePolling() {
+  setInterval(function() {
+    const snapshot = Object.keys(localStorage)
+      .filter(k => SYNC_PREFIXES.some(p => k.startsWith(p)))
+      .sort().map(k => k + '=' + localStorage.getItem(k)).join('|');
+    loadRemoteState(function() {
+      const current = Object.keys(localStorage)
+        .filter(k => SYNC_PREFIXES.some(p => k.startsWith(p)))
+        .sort().map(k => k + '=' + localStorage.getItem(k)).join('|');
+      if (snapshot !== current) {
+        applyTimeOverrides();
+        render();
+      }
+    });
+  }, 30000);
+}
+
 let _timePickIdx = null;
 let _selectedSlots = new Set();
 
 // --- Elfsight schedule ---
 let _elfSettings = null;
 let _elfError = false;
+let _elfErrMsg = '';
 let _elfCanterasSettings = null;
+
+function _elfFetch(url, widgetId, onOk, onFail) {
+  fetch(url)
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(json => {
+      const w = json && json.data && json.data.widgets && json.data.widgets[widgetId];
+      if (!w) throw new Error('widget not found in response');
+      onOk(w.data.settings);
+    })
+    .catch(e => {
+      // Retry once via corsproxy.io in case of CORS block
+      fetch('https://corsproxy.io/?url=' + encodeURIComponent(url))
+        .then(r => r.json())
+        .then(json => {
+          const w = json && json.data && json.data.widgets && json.data.widgets[widgetId];
+          if (!w) throw new Error('widget not found via proxy');
+          onOk(w.data.settings);
+        })
+        .catch(e2 => onFail(e.message + ' / proxy: ' + e2.message));
+    });
+}
 
 function loadElfsightSchedule(cb) {
   if (_elfSettings !== null) { cb(_elfSettings); return; }
-  fetch('https://core.service.elfsight.com/p/boot/?w=bd9e782d-7aa6-4649-8306-97562f8e0fea&page=https://bd9e782d7aa64649830697562f8e0fea.elf.site', { mode: 'cors', credentials: 'omit' })
-    .then(r => r.json())
-    .then(json => {
-      _elfSettings = json.data.widgets['bd9e782d-7aa6-4649-8306-97562f8e0fea'].data.settings;
-      _elfError = false;
-      cb(_elfSettings);
-    })
-    .catch(() => { _elfSettings = {}; _elfError = true; cb({}); });
+  const id = 'bd9e782d-7aa6-4649-8306-97562f8e0fea';
+  _elfFetch('https://core.service.elfsight.com/p/boot/?w=' + id + '&page=https://' + id.replace(/-/g,'') + '.elf.site', id,
+    s => { _elfSettings = s; _elfError = false; cb(s); },
+    msg => { _elfErrMsg = msg; _elfError = true; cb({}); });
 }
 
 function loadElfsightCanterasSchedule(cb) {
   if (_elfCanterasSettings !== null) { cb(_elfCanterasSettings); return; }
-  fetch('https://core.service.elfsight.com/p/boot/?w=c5eb17d4-4278-4b3f-94b0-c06aa179418c&page=https://c5eb17d442784b3f94b0c06aa179418c.elf.site', { mode: 'cors', credentials: 'omit' })
-    .then(r => r.json())
-    .then(json => {
-      _elfCanterasSettings = json.data.widgets['c5eb17d4-4278-4b3f-94b0-c06aa179418c'].data.settings;
-      cb(_elfCanterasSettings);
-    })
-    .catch(() => { _elfCanterasSettings = {}; cb({}); });
+  const id = 'c5eb17d4-4278-4b3f-94b0-c06aa179418c';
+  _elfFetch('https://core.service.elfsight.com/p/boot/?w=' + id + '&page=https://' + id.replace(/-/g,'') + '.elf.site', id,
+    s => { _elfCanterasSettings = s; cb(s); },
+    () => { cb({}); });
 }
 function getElfsightSlotsForDate(settings, dateStr) {
-  if (!settings || !settings.specialIntervals) return [];
+  if (!settings) return [];
   const d = new Date(dateStr + 'T00:00:00');
   const dayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()];
   const special = (settings.specialIntervals || []).find(si =>
@@ -3267,9 +3307,18 @@ function renderTimepickSlots() {
     if (centroS === null || cantS === null) return;
     if (!document.getElementById('timepick-slots')) return;
     const now = new Date();
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayDs = today.toISOString().slice(0, 10);
+    const tomorrowDs = new Date(today.getTime() + 86400000).toISOString().slice(0, 10);
     const nowHHMM = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
     const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
     const diasC = ['dom','lun','mar','mié','jue','vie','sáb'];
+
+    // Start from the booking's date (or today if it's already passed)
+    const editingB = bookings[_timePickIdx];
+    const bookingDs = editingB ? editingB.start.slice(0, 10) : todayDs;
+    const bookingDate = new Date(bookingDs + 'T00:00:00');
+    const startDate = bookingDate > today ? bookingDate : today;
 
     function slotBtn(dateStr, hour, tour) {
       const isCan = tour === 'canteras';
@@ -3282,22 +3331,25 @@ function renderTimepickSlots() {
         ${hour}${badge}</button>`;
     }
 
-    // Collect slots per tour for next days
+    // Collect slots per tour starting from the booking's date
     const centroSlots = [], cantSlots = [];
-    for (let i = 0; i < 14; i++) {
-      const date = new Date(now);
+    for (let i = 0; i < 21; i++) {
+      const date = new Date(startDate);
       date.setDate(date.getDate() + i);
       const ds = date.toISOString().slice(0, 10);
-      const fc = (i === 0 ? getElfsightSlotsForDate(centroS, ds).filter(h => h > nowHHMM) : getElfsightSlotsForDate(centroS, ds));
-      const fk = (i === 0 ? getElfsightSlotsForDate(cantS, ds).filter(h => h > nowHHMM) : getElfsightSlotsForDate(cantS, ds));
-      if (fc.length && centroSlots.length < 3) centroSlots.push({ date, ds, hours: fc, i });
-      if (fk.length && cantSlots.length < 3) cantSlots.push({ date, ds, hours: fk, i });
+      const isToday = ds === todayDs;
+      const fc = isToday ? getElfsightSlotsForDate(centroS, ds).filter(h => h > nowHHMM) : getElfsightSlotsForDate(centroS, ds);
+      const fk = isToday ? getElfsightSlotsForDate(cantS, ds).filter(h => h > nowHHMM) : getElfsightSlotsForDate(cantS, ds);
+      if (fc.length && centroSlots.length < 3) centroSlots.push({ date, ds, hours: fc });
+      if (fk.length && cantSlots.length < 3) cantSlots.push({ date, ds, hours: fk });
       if (centroSlots.length >= 3 && cantSlots.length >= 3) break;
     }
 
     function dayLabel(entry) {
-      const i = entry.i, date = entry.date;
-      return i === 0 ? 'Hoy' : i === 1 ? 'Mañana' : `${diasC[date.getDay()].charAt(0).toUpperCase() + diasC[date.getDay()].slice(1)} ${date.getDate()}`;
+      const ds = entry.ds, date = entry.date;
+      if (ds === todayDs)    return 'Hoy';
+      if (ds === tomorrowDs) return 'Mañana';
+      return `${diasC[date.getDay()].charAt(0).toUpperCase() + diasC[date.getDay()].slice(1)} ${date.getDate()}`;
     }
     function tourSection(slots, tour, color, title) {
       if (!slots.length) return '';
@@ -3320,7 +3372,7 @@ function renderTimepickSlots() {
 
     if (!centroSlots.length && !cantSlots.length) {
       html += _elfError
-        ? `<div style="font-size:0.78rem;color:#e11d48;background:#fff1f2;border-radius:8px;padding:0.6rem 0.75rem">No se pudo cargar el horario. Comprueba la conexión o recarga la app.</div>`
+        ? `<div style="font-size:0.78rem;color:#e11d48;background:#fff1f2;border-radius:8px;padding:0.6rem 0.75rem">No se pudo cargar el horario. Comprueba la conexión o recarga la app.<br><span style="font-size:0.68rem;color:#94a3b8;display:block;margin-top:0.3rem">${_elfErrMsg}</span></div>`
         : `<div style="font-size:0.78rem;color:#94a3b8">No hay tours programados en Elfsight para los próximos días.</div>`;
     }
     container.innerHTML = html;
@@ -3383,14 +3435,16 @@ function buildTimepickWAUrl(who, changeUrl) {
   const phone = b && b.phone ? b.phone.replace(/\s+/g, '') : '';
   if (!phone) return null;
   const nombre = b.name.split(' ')[0];
-  const guia = (who === 'aurora') ? 'Aurora' : 'Cristina';
   const dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
   const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const [datePart] = b.start.split('T');
   const [y, mo, dd] = datePart.split('-');
   const dt = new Date(+y, +mo-1, +dd);
   const fechaOrig = datePart === todayStr ? 'hoy' : `${dias[dt.getDay()]} ${+dd} de ${meses[+mo-1]}`;
-  const msg = `Hola, ${nombre} 👋 Soy ${guia} de Cristitours.\n\nTe escribo sobre tu reserva del Free Tour de ${fechaOrig}. Necesito proponerte un cambio de horario.\n\nElige el hueco que mejor te venga aquí:\n👉 ${changeUrl}\n\nSi ninguna opción te viene bien, respóndeme y lo solucionamos 😊`;
+  const intro = who === 'aurora'
+    ? `Hola, ${nombre} 👋 Soy Cristina de Cristitours. Este tour lo hará mi compañera Aurora.`
+    : `Hola, ${nombre} 👋 Soy Cristina de Cristitours.`;
+  const msg = `${intro}\n\nTe escribo sobre tu reserva del Free Tour de ${fechaOrig}. Necesito proponerte un cambio de horario.\n\nElige el hueco que mejor te venga aquí:\n👉 ${changeUrl}\n\nSi ninguna opción te viene bien, respóndeme y lo solucionamos 😊`;
   return 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
 }
 
@@ -3406,23 +3460,34 @@ function timepickAskGuide(action) {
     const btns = picker.querySelectorAll('button');
     btns.forEach(btn => { btn.disabled = true; btn.style.opacity = '0.5'; });
     const longUrl = buildTimepickChangeUrl();
-    const ac = new AbortController();
-    const tid = setTimeout(() => ac.abort(), 5000);
-    fetch('https://is.gd/create.php?format=json&url=' + encodeURIComponent(longUrl), { signal: ac.signal })
-      .then(r => r.json())
-      .then(data => {
-        clearTimeout(tid);
-        const shortUrl = data.shorturl || longUrl;
-        _timepickWaUrlCristina = buildTimepickWAUrl('cristina', shortUrl);
-        _timepickWaUrlAurora   = buildTimepickWAUrl('aurora', shortUrl);
-        btns.forEach(btn => { btn.disabled = false; btn.style.opacity = ''; });
-      })
-      .catch(() => {
-        clearTimeout(tid);
-        _timepickWaUrlCristina = buildTimepickWAUrl('cristina', longUrl);
-        _timepickWaUrlAurora   = buildTimepickWAUrl('aurora', longUrl);
-        btns.forEach(btn => { btn.disabled = false; btn.style.opacity = ''; });
-      });
+    const cbName = '_isgd_' + Date.now();
+    const script = document.createElement('script');
+    const tid = setTimeout(() => {
+      if (script.parentNode) script.parentNode.removeChild(script);
+      delete window[cbName];
+      _timepickWaUrlCristina = buildTimepickWAUrl('cristina', longUrl);
+      _timepickWaUrlAurora   = buildTimepickWAUrl('aurora', longUrl);
+      btns.forEach(btn => { btn.disabled = false; btn.style.opacity = ''; });
+    }, 5000);
+    window[cbName] = function(data) {
+      clearTimeout(tid);
+      if (script.parentNode) script.parentNode.removeChild(script);
+      delete window[cbName];
+      const shortUrl = data.shorturl || longUrl;
+      _timepickWaUrlCristina = buildTimepickWAUrl('cristina', shortUrl);
+      _timepickWaUrlAurora   = buildTimepickWAUrl('aurora', shortUrl);
+      btns.forEach(btn => { btn.disabled = false; btn.style.opacity = ''; });
+    };
+    script.src = 'https://is.gd/create.php?format=json&url=' + encodeURIComponent(longUrl) + '&callback=' + cbName;
+    script.onerror = function() {
+      clearTimeout(tid);
+      if (script.parentNode) script.parentNode.removeChild(script);
+      delete window[cbName];
+      _timepickWaUrlCristina = buildTimepickWAUrl('cristina', longUrl);
+      _timepickWaUrlAurora   = buildTimepickWAUrl('aurora', longUrl);
+      btns.forEach(btn => { btn.disabled = false; btn.style.opacity = ''; });
+    };
+    document.head.appendChild(script);
   }
 }
 
@@ -3565,7 +3630,7 @@ function renderOpiniones() {
         <div class="card-date">${iconCalendar()} ${formatDate(b.start)}</div>
         <div class="card-meta">
           <span class="meta-item">${b.phone}</span>
-          <span class="meta-item" style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:bottom;cursor:pointer" title="${b.email}" onclick="this.style.whiteSpace=this.style.whiteSpace==='normal'?'nowrap':'normal';this.style.overflow=this.style.overflow==='visible'?'hidden':'visible'">${b.email}</span>
+          ${b.email ? `<span class="meta-item" style="max-width:160px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:block" title="${b.email}" onclick="this.style.whiteSpace=this.style.whiteSpace==='normal'?'nowrap':'normal';this.style.overflow=this.style.overflow==='visible'?'hidden':'visible'">${b.email}</span>` : ''}
         </div>
         <div class="card-footer" style="flex-wrap:wrap;gap:0.5rem">
           <div class="people-badge">${iconPeople()} ${b.people} persona${b.people > 1 ? 's' : ''}</div>
@@ -3707,6 +3772,7 @@ function onDataReady() {
   loadRemoteState(function() {
     applyTimeOverrides();
     dismissLoadingScreen();
+    startRemotePolling();
   });
 }
 

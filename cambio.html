@@ -260,13 +260,11 @@
     return { date: p[0], hour: p[1], tour: p[2] || 'centro' };
   }).filter(s => s.date && s.hour) : [];
 
+  const MESES_C = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
   function dayLabel(dateStr) {
-    const today = new Date(); today.setHours(0,0,0,0);
     const d = new Date(dateStr + 'T00:00:00');
-    const diff = Math.round((d - today) / 86400000);
-    if (diff === 0) return 'Hoy';
-    if (diff === 1) return 'Mañana';
-    return `${DIAS[d.getDay()].charAt(0).toUpperCase() + DIAS[d.getDay()].slice(1)} ${d.getDate()} de ${MESES[d.getMonth()]}`;
+    const day = DIAS_C[d.getDay()].charAt(0).toUpperCase() + DIAS_C[d.getDay()].slice(1);
+    return `${day} ${d.getDate()} ${MESES_C[d.getMonth()]}`;
   }
 
   function renderSlots() {
@@ -337,13 +335,13 @@
       }
     };
 
+    const overrideValue = JSON.stringify({ start: newStart, tour: slot.tour });
     const s  = document.createElement('script');
     s.onerror = function() { clearTimeout(timer); delete window[cbName]; showError(); };
     s.src = SCRIPT_URL
       + '?action=save'
-      + '&key='   + encodeURIComponent(key)
-      + '&start=' + encodeURIComponent(newStart)
-      + '&tour='  + encodeURIComponent(slot.tour)
+      + '&key='      + encodeURIComponent(key)
+      + '&value='    + encodeURIComponent(overrideValue)
       + '&callback=' + cbName;
     document.head.appendChild(s);
   }
