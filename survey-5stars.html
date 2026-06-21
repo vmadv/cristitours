@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cristitours — ¡Gracias!</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(160deg, #1a56db 0%, #1e40af 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .card {
+      max-width: 360px;
+      width: 100%;
+      animation: fadeUp 0.5s ease;
+    }
+
+    .logo {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 2.5rem;
+    }
+
+    .star-icon {
+      font-size: 4rem;
+      line-height: 1;
+      animation: pulse 1.4s ease-in-out infinite;
+      display: block;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      color: white;
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 5px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: white;
+      border-radius: 99px;
+      transition: width 1.8s ease;
+    }
+
+    .hint {
+      color: rgba(255,255,255,0.45);
+      font-size: 0.72rem;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Cristitours</div>
+    <span class="star-icon">⭐</span>
+    <h1>¡Nos alegra que te haya gustado el tour!</h1>
+    <p>
+      Tus 5 estrellas en Google nos ayudarían muchísimo —<br>
+      solo te llevará un segundo y significaría mucho para nosotros.
+    </p>
+    <div class="progress-track">
+      <div class="progress-fill" id="bar"></div>
+    </div>
+    <p class="hint">Abriendo Google Reviews...</p>
+  </div>
+
+  <script>
+    const REVIEW_URL = 'https://g.page/r/Cb4LHaNCVqszEBM/review';
+
+    // Mostrar reseña generada si viene del flujo de etiquetas
+    const reviewText = sessionStorage.getItem('reviewText');
+    if (reviewText) {
+      const box = document.createElement('div');
+      box.style.cssText = 'background:rgba(255,255,255,0.12);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;max-width:320px;text-align:left';
+      box.innerHTML =
+        '<p style="color:rgba(255,255,255,0.6);font-size:0.7rem;font-weight:600;margin:0 0 0.4rem;text-transform:uppercase;letter-spacing:0.5px">Reseña generada</p>' +
+        '<p style="color:white;font-size:0.82rem;line-height:1.6;margin:0">"' + reviewText + '"</p>';
+      const card = document.querySelector('.card');
+      const progress = card.querySelector('.progress-track');
+      card.insertBefore(box, progress);
+
+      const hint = document.createElement('div');
+      hint.style.cssText = 'background:rgba(255,255,255,0.2);border-radius:10px;padding:0.65rem 1rem;margin-bottom:1rem;max-width:320px';
+      hint.innerHTML = '<p style="color:white;font-size:0.82rem;font-weight:700;margin:0 0 0.2rem">📋 Texto copiado al portapapeles</p>' +
+        '<p style="color:rgba(255,255,255,0.75);font-size:0.75rem;margin:0;line-height:1.5">En Google: borra el texto que aparece, luego <strong style="color:white">pega con Cmd+V</strong> (Mac) o <strong style="color:white">Ctrl+V</strong> (Windows)</p>';
+      card.insertBefore(hint, progress);
+
+      sessionStorage.removeItem('reviewText');
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.getElementById('bar').style.width = '100%';
+      });
+    });
+
+    setTimeout(() => {
+      window.location.href = REVIEW_URL;
+    }, 2500);
+  </script>
+</body>
+</html>
