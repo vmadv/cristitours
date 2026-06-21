@@ -1416,7 +1416,8 @@ function bookingKey(b) {
 }
 
 function isConfirmed(b) {
-  return localStorage.getItem(bookingKey(b)) === '1';
+  const v = localStorage.getItem(bookingKey(b));
+  return v !== null && v !== '' && v !== '0';
 }
 
 function cancelledKey(b) {
@@ -1424,7 +1425,8 @@ function cancelledKey(b) {
 }
 
 function isCancelled(b) {
-  return b.otaCancelled === true || localStorage.getItem(cancelledKey(b)) === '1';
+  const v = localStorage.getItem(cancelledKey(b));
+  return b.otaCancelled === true || (v !== null && v !== '' && v !== '0');
 }
 
 function deletedKey(b) {
@@ -1432,7 +1434,8 @@ function deletedKey(b) {
 }
 
 function isDeleted(b) {
-  return localStorage.getItem(deletedKey(b)) === '1';
+  const v = localStorage.getItem(deletedKey(b));
+  return v !== null && v !== '' && v !== '0';
 }
 
 let _manualConfirmIdx = null;
