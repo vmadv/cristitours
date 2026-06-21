@@ -3300,6 +3300,22 @@ function openTimePick(idx, prefillDate, prefillHour) {
     <div style="font-size:0.8rem;color:#64748b;margin-bottom:1rem">${b.name}</div>
     ${warningHtml}
     <div id="timepick-slots" style="margin-bottom:0.75rem"></div>
+    <div style="margin-bottom:1rem;background:#f8fafc;border-radius:12px;padding:0.75rem">
+      <div style="font-size:0.7rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem">Añadir fecha manual</div>
+      <div style="display:flex;gap:0.35rem;align-items:center">
+        <input type="date" id="tp-manual-date" style="flex:2;padding:0.4rem 0.45rem;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.8rem;color:#1a202c;min-width:0">
+        <select id="tp-manual-time" style="flex:1;padding:0.4rem 0.35rem;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.8rem;color:#1a202c;min-width:0">
+          <option>10:00</option><option>11:00</option><option>12:00</option>
+          <option>16:00</option><option>17:00</option><option>18:00</option>
+        </select>
+        <select id="tp-manual-tour" style="flex:1;padding:0.4rem 0.35rem;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.8rem;color:#1a202c;min-width:0">
+          <option value="centro">LPA</option>
+          <option value="canteras">Can.</option>
+        </select>
+        <button onclick="timepickAddManual()" style="padding:0.4rem 0.65rem;border:none;border-radius:8px;background:#1d4ed8;color:white;font-size:0.9rem;font-weight:700;cursor:pointer;flex-shrink:0">+</button>
+      </div>
+      <div id="tp-manual-list" style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem"></div>
+    </div>
     <div style="display:flex;gap:0.5rem;margin-bottom:1rem">
       <button id="timepick-propose-btn" onclick="timepickProposeWA(this)"
         style="flex:1;padding:0.65rem 0.5rem;border:none;border-radius:10px;background:#f0fdf4;color:#15803d;font-size:0.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.35rem;opacity:0.35;pointer-events:none">
@@ -3321,6 +3337,10 @@ function openTimePick(idx, prefillDate, prefillHour) {
 
   document.getElementById('timepick-overlay').style.display = 'flex';
   document.getElementById('timepick-sheet').dataset.tour = initTour;
+  const _tpTmr = new Date(); _tpTmr.setDate(_tpTmr.getDate() + 1);
+  const _tpFmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const manualDateEl = document.getElementById('tp-manual-date');
+  if (manualDateEl) manualDateEl.value = _tpFmt(_tpTmr);
   renderTimepickSlots();
 }
 
@@ -3492,38 +3512,45 @@ function buildTimepickWAUrl(who, changeUrl) {
 }
 
 function timepickProposeWA(btn) {
-  btn.disabled = true;
-  btn.style.opacity = '0.6';
-  btn.innerHTML = `${_svgWAtp} Preparando...`;
-  const longUrl = buildTimepickChangeUrl();
-  function ready(url) {
-    const waUrl = buildTimepickWAUrl('cristina', url);
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    btn.innerHTML = `${_svgWAtp} Enviar →`;
-    btn.onclick = function() { if (waUrl) window.open(waUrl, '_blank'); closeTimePick(); };
+  const url = buildTimepickChangeUrl();
+  if (!url) return;
+  const waUrl = buildTimepickWAUrl('cristina', url);
+  if (waUrl) { window.open(waUrl, '_blank'); closeTimePick(); }
+}
+
+function timepickAddManual() {
+  const ds  = (document.getElementById('tp-manual-date') || {}).value;
+  const hr  = (document.getElementById('tp-manual-time') || {}).value;
+  const tr  = (document.getElementById('tp-manual-tour') || {}).value || 'centro';
+  if (!ds || !hr) return;
+  const key = ds + '|' + hr + '|' + tr;
+  if (_selectedSlots.has(key)) return;
+  _selectedSlots.add(key);
+  const list = document.getElementById('tp-manual-list');
+  if (list) {
+    const d = new Date(ds + 'T00:00:00');
+    const DI = ['dom','lun','mar','mié','jue','vie','sáb'];
+    const ME = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    const label = `${DI[d.getDay()]} ${d.getDate()} ${ME[d.getMonth()]} ${hr}`;
+    const isCan = tr === 'canteras';
+    const chip = document.createElement('div');
+    chip.id = 'tp-chip-' + key.replace(/[^a-z0-9]/gi,'_');
+    chip.style.cssText = `display:inline-flex;align-items:center;gap:0.3rem;background:${isCan?'#dcfce7':'#dbeafe'};color:${isCan?'#15803d':'#1d4ed8'};border-radius:99px;padding:0.25rem 0.6rem;font-size:0.75rem;font-weight:700`;
+    chip.innerHTML = `${label} <span onclick="timepickRemoveManual('${key.replace(/'/g,"\\'")}')" style="cursor:pointer;opacity:0.55;line-height:1">✕</span>`;
+    list.appendChild(chip);
   }
-  const cbName = '_isgd_' + Date.now();
-  const script = document.createElement('script');
-  const tid = setTimeout(() => {
-    if (script.parentNode) script.parentNode.removeChild(script);
-    delete window[cbName];
-    ready(longUrl);
-  }, 5000);
-  window[cbName] = function(data) {
-    clearTimeout(tid);
-    if (script.parentNode) script.parentNode.removeChild(script);
-    delete window[cbName];
-    ready(data.shorturl || longUrl);
-  };
-  script.src = 'https://is.gd/create.php?format=json&url=' + encodeURIComponent(longUrl) + '&callback=' + cbName;
-  script.onerror = function() {
-    clearTimeout(tid);
-    if (script.parentNode) script.parentNode.removeChild(script);
-    delete window[cbName];
-    ready(longUrl);
-  };
-  document.head.appendChild(script);
+  const has = _selectedSlots.size > 0;
+  const pb = document.getElementById('timepick-propose-btn');
+  if (pb) { pb.style.opacity = has ? '1' : '0.35'; pb.style.pointerEvents = has ? 'auto' : 'none'; }
+}
+
+function timepickRemoveManual(key) {
+  _selectedSlots.delete(key);
+  const chip = document.getElementById('tp-chip-' + key.replace(/[^a-z0-9]/gi,'_'));
+  if (chip) chip.remove();
+  const has = _selectedSlots.size > 0;
+  const pb = document.getElementById('timepick-propose-btn');
+  if (pb) { pb.style.opacity = has ? '1' : '0.35'; pb.style.pointerEvents = has ? 'auto' : 'none'; }
 }
 
 function timepickAskGuide(action) {
