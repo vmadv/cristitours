@@ -3155,10 +3155,15 @@ function applyTimeOverrides() {
     if (b._origStart === undefined) { b._origStart = b.start; b._origTour = b.tour; }
     b.start = b._origStart;
     b.tour  = b._origTour;
-    const ov = getTimeOverride(b);
-    if (ov) {
-      if (ov.start) b.start = ov.start;
-      if (ov.tour)  b.tour  = ov.tour;
+    const seen = new Set();
+    while (true) {
+      const key = timeOverrideKey(b);
+      if (seen.has(key)) break;
+      seen.add(key);
+      const ov = getTimeOverride(b);
+      if (!ov || !ov.start) break;
+      b.start = ov.start;
+      if (ov.tour) b.tour = ov.tour;
     }
   });
 }
