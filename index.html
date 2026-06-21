@@ -3422,6 +3422,48 @@ function renderTimepickSlots() {
       return s;
     }
 
+    // Slots BEFORE the booking date (from today up to booking day, excluding booking's own slot)
+    const bookingSlot = editingB ? editingB.start.slice(0, 10) + '|' + editingB.start.slice(11, 16) : null;
+    const prevCentroSlots = [], prevCantSlots = [];
+    if (bookingDate > today) {
+      for (let i = 1; i <= 5; i++) {
+        const date = new Date(bookingDate);
+        date.setDate(date.getDate() - i);
+        const ds = _lds(date);
+        if (ds < todayDs) break;
+        const isToday = ds === todayDs;
+        const fc = getElfsightSlotsForDate(centroS, ds)
+          .filter(h => (!isToday || h > nowHHMM) && (ds + '|' + h) !== bookingSlot);
+        const fk = getElfsightSlotsForDate(cantS, ds)
+          .filter(h => (!isToday || h > nowHHMM) && (ds + '|' + h) !== bookingSlot);
+        if (fc.length) prevCentroSlots.push({ date, ds, hours: fc });
+        if (fk.length) prevCantSlots.push({ date, ds, hours: fk });
+      }
+    }
+
+    function slotBtnPrev(dateStr, hour, tour) {
+      const isCan = tour === 'canteras';
+      const key = dateStr + '|' + hour + '|' + tour;
+      const btnId = 'slot-' + dateStr + '-' + hour.replace(':', '') + '-' + tour;
+      return `<button id="${btnId}" onclick="timepickToggleSlot('${dateStr}','${hour}','${tour}')"
+        style="padding:0.4rem 0.7rem;border-radius:99px;border:1.5px solid #e2e8f0;background:#f1f5f9;color:#64748b;font-size:0.82rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center">
+        ${hour}</button>`;
+    }
+    function tourSectionPrev(slots, tour, color, title) {
+      if (!slots.length) return '';
+      let s = `<div style="margin-bottom:0.75rem">
+        <div style="font-size:0.68rem;font-weight:700;color:${color};opacity:0.7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem">${title}</div>`;
+      slots.forEach(entry => {
+        s += `<div style="margin-bottom:0.4rem">
+          <div style="font-size:0.68rem;color:#94a3b8;margin-bottom:0.2rem">${dayLabel(entry)} · ${entry.date.getDate()} ${meses[entry.date.getMonth()]}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.3rem">`;
+        entry.hours.forEach(h => { s += slotBtnPrev(entry.ds, h, tour); });
+        s += `</div></div>`;
+      });
+      s += `</div>`;
+      return s;
+    }
+
     let html = `<div style="font-size:0.7rem;font-weight:700;color:#475569;margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.5px">Toca para seleccionar y proponer</div>`;
     html += tourSection(centroSlots, 'centro', '#1d4ed8', 'Las Palmas — Centro Histórico');
     html += tourSection(cantSlots, 'canteras', '#15803d', 'Las Canteras');
@@ -3431,6 +3473,19 @@ function renderTimepickSlots() {
         ? `<div style="font-size:0.78rem;color:#e11d48;background:#fff1f2;border-radius:8px;padding:0.6rem 0.75rem">No se pudo cargar el horario. Comprueba la conexión o recarga la app.<br><span style="font-size:0.68rem;color:#94a3b8;display:block;margin-top:0.3rem">${_elfErrMsg}</span></div>`
         : `<div style="font-size:0.78rem;color:#94a3b8">No hay tours programados en Elfsight para los próximos días.</div>`;
     }
+
+    if (prevCentroSlots.length || prevCantSlots.length) {
+      const prevId = 'tp-prev-' + Date.now();
+      html += `<details style="margin-top:0.5rem;margin-bottom:0.25rem">
+        <summary style="font-size:0.75rem;font-weight:600;color:#94a3b8;cursor:pointer;list-style:none;display:flex;align-items:center;gap:0.3rem;user-select:none">
+          <span id="${prevId}-arrow">▸</span> También antes del tour
+        </summary>
+        <div style="margin-top:0.6rem;padding:0.65rem 0.75rem;background:#f8fafc;border-radius:10px">`;
+      html += tourSectionPrev(prevCentroSlots, 'centro', '#1d4ed8', 'Las Palmas — Centro Histórico');
+      html += tourSectionPrev(prevCantSlots, 'canteras', '#15803d', 'Las Canteras');
+      html += `</div></details>`;
+    }
+
     container.innerHTML = html;
   }
 
