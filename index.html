@@ -703,6 +703,8 @@
   <span style="color:#e2e8f0;font-size:1rem;line-height:1;align-self:center">|</span>
   <button class="filter-btn" data-group="time" data-val="rendimiento" onclick="setFilter('rendimiento')" style="color:#b0bac7;font-size:0.78rem">📊 Rendimiento</button>
   <button class="filter-btn" data-group="time" data-val="estimacion" onclick="setFilter('estimacion')" style="color:#b0bac7;font-size:0.78rem">📈 Estimación</button>
+  <span style="color:#e2e8f0;font-size:1rem;line-height:1;align-self:center">|</span>
+  <button onclick="forceSyncNow(this)" style="background:none;border:none;color:#94a3b8;font-size:0.82rem;cursor:pointer;padding:0.25rem 0.5rem;border-radius:6px" title="Sincronizar ahora">⟳</button>
 </div>
 
 <div id="today-banner"></div>
@@ -3161,21 +3163,47 @@ function applyTimeOverrides() {
   });
 }
 
+function _syncSnapshot() {
+  return Object.keys(localStorage)
+    .filter(k => SYNC_PREFIXES.some(p => k.startsWith(p)))
+    .sort().map(k => k + '=' + localStorage.getItem(k)).join('|');
+}
+
+function forceSyncNow(btn) {
+  if (btn) { btn.style.color = '#f59e0b'; btn.textContent = '⟳'; }
+  const snapshot = _syncSnapshot();
+  loadRemoteState(function() {
+    const current = _syncSnapshot();
+    const changed = snapshot !== current;
+    if (changed) { applyTimeOverrides(); render(); }
+    if (btn) { btn.style.color = changed ? '#22c55e' : '#94a3b8'; btn.textContent = '⟳'; setTimeout(() => { btn.style.color = '#94a3b8'; }, 2000); }
+    _showSyncToast(changed);
+  });
+}
+
+function _showSyncToast(changed) {
+  let t = document.getElementById('_sync-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_sync-toast';
+    t.style.cssText = 'position:fixed;top:1rem;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:0.5rem 1rem;border-radius:8px;font-size:0.8rem;font-weight:600;z-index:9999;transition:opacity 0.3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = changed ? '✓ Cambio detectado y aplicado' : 'Sin cambios nuevos';
+  t.style.background = changed ? '#15803d' : '#1e293b';
+  t.style.opacity = '1';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
 function startRemotePolling() {
   setInterval(function() {
-    const snapshot = Object.keys(localStorage)
-      .filter(k => SYNC_PREFIXES.some(p => k.startsWith(p)))
-      .sort().map(k => k + '=' + localStorage.getItem(k)).join('|');
+    const snapshot = _syncSnapshot();
     loadRemoteState(function() {
-      const current = Object.keys(localStorage)
-        .filter(k => SYNC_PREFIXES.some(p => k.startsWith(p)))
-        .sort().map(k => k + '=' + localStorage.getItem(k)).join('|');
-      if (snapshot !== current) {
-        applyTimeOverrides();
-        render();
-      }
+      const current = _syncSnapshot();
+      if (snapshot !== current) { applyTimeOverrides(); render(); }
     });
-  }, 30000);
+  }, 10000);
 }
 
 let _timePickIdx = null;
@@ -3313,8 +3341,9 @@ function renderTimepickSlots() {
     if (!document.getElementById('timepick-slots')) return;
     const now = new Date();
     const today = new Date(); today.setHours(0,0,0,0);
-    const todayDs = today.toISOString().slice(0, 10);
-    const tomorrowDs = new Date(today.getTime() + 86400000).toISOString().slice(0, 10);
+    const _lds = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const todayDs = _lds(today);
+    const tomorrowDs = _lds(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1));
     const nowHHMM = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
     const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
     const diasC = ['dom','lun','mar','mié','jue','vie','sáb'];
@@ -3341,7 +3370,7 @@ function renderTimepickSlots() {
     for (let i = 0; i < 21; i++) {
       const date = new Date(startDate);
       date.setDate(date.getDate() + i);
-      const ds = date.toISOString().slice(0, 10);
+      const ds = _lds(date);
       const isToday = ds === todayDs;
       const fc = isToday ? getElfsightSlotsForDate(centroS, ds).filter(h => h > nowHHMM) : getElfsightSlotsForDate(centroS, ds);
       const fk = isToday ? getElfsightSlotsForDate(cantS, ds).filter(h => h > nowHHMM) : getElfsightSlotsForDate(cantS, ds);
@@ -3444,10 +3473,16 @@ function buildTimepickWAUrl(who, changeUrl) {
   const [y, mo, dd] = datePart.split('-');
   const dt = new Date(+y, +mo-1, +dd);
   const fechaOrig = datePart === todayStr ? 'hoy' : `${dias[dt.getDay()]} ${+dd} de ${meses[+mo-1]}`;
+  const slotLines = [..._selectedSlots].sort().map(s => {
+    const [ds, hr] = s.split('|');
+    const [sy, sm, sd] = ds.split('-');
+    const d = new Date(+sy, +sm-1, +sd);
+    return `· ${dias[d.getDay()]} ${+sd} de ${meses[+sm-1]} a las ${hr}`;
+  }).join('\n');
   const intro = who === 'aurora'
     ? `Hola, ${nombre} 👋 Soy Cristina de Cristitours. Este tour lo hará mi compañera Aurora.`
     : `Hola, ${nombre} 👋 Soy Cristina de Cristitours.`;
-  const msg = `${intro}\n\nTe escribo sobre tu reserva del Free Tour de ${fechaOrig}. Necesito proponerte un cambio de horario.\n\nElige el hueco que mejor te venga aquí:\n👉 ${changeUrl}\n\nSi ninguna opción te viene bien, respóndeme y lo solucionamos 😊`;
+  const msg = `${intro}\n\nTe escribo sobre tu reserva del Free Tour de ${fechaOrig}. Necesito proponerte un cambio de horario.\n\nTe propongo estas opciones:\n${slotLines}\n\nConfirma o elige otro hueco aquí:\n👉 ${changeUrl}\n\nSi ninguna opción te viene bien, respóndeme y lo solucionamos 😊`;
   return 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
 }
 
@@ -3517,6 +3552,19 @@ function timepickSetTour(t) {
   document.getElementById('tp-btn-canteras').style.color       = !isCentro ? '#15803d' : '#64748b';
 }
 
+function _remoteSetTimeOverride(key, start, tour) {
+  if (!SYNC_ENDPOINT) return;
+  const fn = '_rOv' + Date.now();
+  window[fn] = function() { delete window[fn]; };
+  const s = document.createElement('script');
+  s.onerror = function() { delete window[fn]; };
+  s.src = SYNC_ENDPOINT + '?action=save&key=' + encodeURIComponent(key)
+        + '&start=' + encodeURIComponent(start)
+        + '&tour='  + encodeURIComponent(tour)
+        + '&callback=' + fn;
+  document.head.appendChild(s);
+}
+
 function saveTimePick(date, hour) {
   const idx  = _timePickIdx;
   const b    = bookings[idx];
@@ -3524,7 +3572,10 @@ function saveTimePick(date, hour) {
   if (!date || !hour) return;
   const newStart = date + 'T' + hour;
   const k = timeOverrideKey(b);
+  _syncPaused = true;
   localStorage.setItem(k, JSON.stringify({ start: newStart, tour }));
+  _syncPaused = false;
+  _remoteSetTimeOverride(k, newStart, tour);
   b.start = newStart;
   b.tour  = tour;
   render();
