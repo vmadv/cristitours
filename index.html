@@ -3123,9 +3123,13 @@ function loadRemoteState(callback) {
   if (!SYNC_ENDPOINT) { callback(); return; }
   const fn = '_rLoad' + Date.now();
   window[fn] = function(data) {
-    if (data && data.data) {
+    if (data && data.overrides) {
       _syncPaused = true;
-      Object.entries(data.data).forEach(([k, v]) => localStorage.setItem(k, v));
+      Object.entries(data.overrides).forEach(([k, v]) => {
+        if (v && v.start) {
+          localStorage.setItem(k, JSON.stringify({ start: String(v.start), tour: String(v.tour || '') }));
+        }
+      });
       _syncPaused = false;
     }
     delete window[fn];

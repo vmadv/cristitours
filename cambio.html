@@ -335,13 +335,13 @@
       }
     };
 
-    const overrideValue = JSON.stringify({ start: newStart, tour: slot.tour });
     const s  = document.createElement('script');
     s.onerror = function() { clearTimeout(timer); delete window[cbName]; showError(); };
     s.src = SCRIPT_URL
       + '?action=save'
       + '&key='      + encodeURIComponent(key)
-      + '&value='    + encodeURIComponent(overrideValue)
+      + '&start='    + encodeURIComponent(newStart)
+      + '&tour='     + encodeURIComponent(slot.tour)
       + '&callback=' + cbName;
     document.head.appendChild(s);
   }
