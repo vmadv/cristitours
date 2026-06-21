@@ -3136,6 +3136,8 @@ function loadRemoteState(callback) {
       Object.entries(data.overrides).forEach(([k, v]) => {
         if (v && v.start) {
           localStorage.setItem(k, JSON.stringify({ start: String(v.start), tour: String(v.tour || '') }));
+        } else if (v && v.value) {
+          localStorage.setItem(k, String(v.value));
         }
       });
       _syncPaused = false;
