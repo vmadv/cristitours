@@ -19,7 +19,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     @keyframes ldSpin { to { transform: rotate(360deg); } }
-    @keyframes pcPopIn { from { opacity:0; transform:scale(0.92) translateY(8px); } to { opacity:1; transform:none; } }
     @keyframes ldPop  { 0%{transform:scale(0);opacity:0} 60%{transform:scale(1.3)} 100%{transform:scale(1);opacity:1} }
     @keyframes ldBar  { from{width:0} to{width:100%} }
     @keyframes ldRow  { from{opacity:0;transform:translateX(-12px)} to{opacity:1;transform:none} }
@@ -1233,40 +1232,86 @@ function renderNovedades() {
   el.innerHTML = html;
 }
 
-// --- Pending change proposals ---
+// --- Pending change proposals (solo llamadas) ---
 function pendingChangeKey(b) { return 'pending_change_' + bookingKey(b); }
 function setPendingChange(b, slots) { localStorage.setItem(pendingChangeKey(b), JSON.stringify({ slots, sentAt: Date.now() })); }
 function clearPendingChange(b) { localStorage.removeItem(pendingChangeKey(b)); }
 function getPendingChange(b) { try { const v = localStorage.getItem(pendingChangeKey(b)); return v ? JSON.parse(v) : null; } catch { return null; } }
 
-function renderPendingChanges() {
-  const el = document.getElementById('pending-changes');
-  if (!el) return;
-  const pending = bookings.filter(b =>
-    !isDeleted(b) && !isCancelled(b) && getPendingChange(b) &&
-    !localStorage.getItem('not_interested_' + bookingKey(b))
-  );
-  if (!pending.length) { el.innerHTML = ''; return; }
+function checkPendingCalls() {
+  const pending = bookings.filter(b => !isDeleted(b) && !isCancelled(b) && getPendingChange(b));
+  if (!pending.length) return;
+  showPendingCallConfirm(pending[0]);
+}
 
-  const diasC = ['dom','lun','mar','mié','jue','vie','sáb'];
-  const mesesC = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function showPendingCallConfirm(b) {
+  const pc = getPendingChange(b);
+  if (!pc || !pc.slots || !pc.slots.length) { clearPendingChange(b); return; }
+  const bi = bookings.indexOf(b);
+  const nombre = toTitleCase(b.name.trim().split(/\s+/)[0]);
+  const DIAS  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const DC = ['dom','lun','mar','mié','jue','vie','sáb'];
+  const MC = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
-  const n = pending.length;
-  const label = n === 1
-    ? `<strong>${toTitleCase(pending[0].name.trim().split(/\s+/)[0])}</strong> espera confirmar su nuevo horario`
-    : `<strong>${n} reservas</strong> esperan confirmar su nuevo horario`;
+  let slotsHtml = '';
+  pc.slots.forEach((key, si) => {
+    const [ds, hr, tour] = key.split('|');
+    const d2 = new Date(ds + 'T00:00:00');
+    const diff = Math.round((d2 - new Date(new Date().toDateString())) / 86400000);
+    const lbl = diff === 0 ? 'Hoy' : diff === 1 ? 'Mañana'
+      : `${DC[d2.getDay()].charAt(0).toUpperCase() + DC[d2.getDay()].slice(1)} ${d2.getDate()} ${MC[d2.getMonth()]}`;
+    const isCan = tour === 'canteras';
+    const color = isCan ? '#15803d' : '#1d4ed8';
+    const bg    = isCan ? '#dcfce7' : '#dbeafe';
+    const border= isCan ? '#86efac' : '#93c5fd';
+    const tourLbl = isCan ? 'Las Canteras' : 'Las Palmas';
+    slotsHtml += `<button onclick="pcCallConfirm(${bi},${si})"
+      style="width:100%;padding:0.65rem 0.9rem;border-radius:10px;border:1.5px solid ${border};background:${bg};color:${color};font-size:0.9rem;font-weight:700;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">
+      <span>${lbl} · ${hr}</span>
+      <span style="font-size:0.72rem;font-weight:500;opacity:0.75">${tourLbl}</span>
+    </button>`;
+  });
 
-  const html = `<div onclick="checkPendingOnLoad()"
-    style="margin:0 0 0.75rem;padding:0.8rem 1rem;background:#fffbeb;border-left:3px solid #f59e0b;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:0.75rem">
-    <div>
-      <div style="font-size:0.68rem;font-weight:800;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.2rem">⏳ Esperando confirmación</div>
-      <div style="font-size:0.82rem;color:#92400e">${label}</div>
-    </div>
-    <div style="flex-shrink:0;background:#f59e0b;color:white;border-radius:8px;padding:0.4rem 0.75rem;font-size:0.78rem;font-weight:700">Confirmar →</div>
-  </div>`;
-  el.innerHTML = html;
+  let overlay = document.getElementById('pc-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'pc-overlay';
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closePcOverlay(); });
+    document.body.appendChild(overlay);
+  }
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:3000;display:flex;align-items:center;justify-content:center;padding:1.25rem';
+  overlay.innerHTML = `
+    <div style="background:white;border-radius:24px;width:100%;max-width:400px;box-shadow:0 32px 80px rgba(0,0,0,0.3)">
+      <div style="padding:1.75rem 1.5rem 1rem;text-align:center">
+        <div style="width:52px;height:52px;background:#dbeafe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 0.9rem;font-size:1.5rem">📞</div>
+        <div style="font-size:1.1rem;font-weight:800;color:#1a202c;margin-bottom:0.3rem">¿Qué horario confirmó?</div>
+        <div style="font-size:0.85rem;color:#64748b"><strong>${nombre}</strong> acordó por llamada</div>
+      </div>
+      <div style="padding:0 1.25rem 0.5rem">${slotsHtml}</div>
+      <div style="padding:0.75rem 1.25rem;border-top:1px solid #f1f5f9">
+        <button onclick="closePcOverlay()" style="width:100%;padding:0.7rem;border:1.5px solid #e2e8f0;border-radius:10px;background:white;color:#94a3b8;font-size:0.875rem;font-weight:600;cursor:pointer">Más tarde</button>
+      </div>
+    </div>`;
+}
+
+function pcCallConfirm(bookingIdx, slotIdx) {
+  const b  = bookings[bookingIdx];
+  const pc = getPendingChange(b);
+  if (!pc || !pc.slots[slotIdx]) return;
+  const [ds, hr, tour] = pc.slots[slotIdx].split('|');
+  const k = timeOverrideKey(b);
+  localStorage.setItem(k, JSON.stringify({ start: ds + 'T' + hr, tour: tour || b.tour }));
+  b.start = ds + 'T' + hr;
+  b.tour  = tour || b.tour;
+  clearPendingChange(b);
+  closePcOverlay();
+  render();
+}
+
+function closePcOverlay() {
+  const el = document.getElementById('pc-overlay');
+  if (el) el.remove();
 }
 
 function confirmPendingSlot(idx, dateStr, hour) {
@@ -1297,7 +1342,6 @@ function confirmPendingSlot(idx, dateStr, hour) {
 
 function updateStats() {
   renderNovedades();
-  renderPendingChanges();
 }
 
 const TODAY = new Date();
@@ -1689,7 +1733,7 @@ function cardActions(b) {
   const svgWA = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`;
 
   const svgLink = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
-  const svgClock = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M8 18h.01M12 18h.01"/></svg>`;
+  const svgClock = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`;
   const contactBtn = b.source === 'civitatis' && b.contactUrl
     ? `<button onclick="openCivitatisConfirm('${b.name.replace(/'/g,"\\'")}','${b.contactUrl}')" class="action-btn whatsapp confirm-btn" style="background:#dbeafe;color:#1a56db;border:none">${svgLink} Confirmar reserva</button>`
     : b.source === 'guruwalk' && !isPast
@@ -1786,7 +1830,6 @@ const ADS_SHEET_NAME = 'Coste%20campa%C3%B1as';
 function renderRendimiento() {
   document.getElementById('today-banner').innerHTML = '';
   document.getElementById('novedades').innerHTML = '';
-  renderPendingChanges();
   document.getElementById('app').innerHTML = `<div style="padding:1.5rem 0;text-align:center;color:#94a3b8;font-size:0.9rem">Cargando datos...</div>`;
   loadAdsData();
 }
@@ -2005,7 +2048,6 @@ function setEstimacionVista(v) {
 function renderEstimacion() {
   document.getElementById('today-banner').innerHTML = '';
   document.getElementById('novedades').innerHTML = '';
-  renderPendingChanges();
 
   const PRICE = 12;
   const HIST_FROM = '2026-04';
@@ -2332,7 +2374,7 @@ function renderTours() {
       const svgWA   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`;
       const svgCheck = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
       const svgX     = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
-      const svgClk   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M8 18h.01M12 18h.01"/></svg>`;
+      const svgClk   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`;
       const btnBase  = 'flex-shrink:0;width:30px;height:30px;border-radius:8px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;';
 
       // Lista de personas
@@ -2370,7 +2412,7 @@ function renderTours() {
               ${confirmed ? `<span style="font-size:0.62rem;font-weight:700;background:#dcfce7;color:#15803d;padding:0.1rem 0.4rem;border-radius:4px">✓ Confirmada</span>` : ''}
             </div>
             ${b.phone ? `<div style="font-size:0.78rem;color:#475569;margin-top:0.1rem">${b.phone}</div>` : ''}
-            ${b.email ? `<div style="font-size:0.75rem;color:#94a3b8;margin-top:0.05rem">${b.email}</div>` : ''}
+            ${b.email ? `<div style="font-size:0.75rem;color:#94a3b8;margin-top:0.05rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer" title="${b.email}" onclick="this.style.whiteSpace=this.style.whiteSpace==='normal'?'nowrap':'normal';this.style.overflow=this.style.overflow==='visible'?'hidden':'visible'">${b.email}</div>` : ''}
             ${!hasContact ? `<div style="font-size:0.75rem;color:#cbd5e1;margin-top:0.1rem">Sin contacto</div>` : ''}
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;flex-shrink:0">
@@ -2501,7 +2543,7 @@ function render() {
           <div class="card-date">${iconCalendar()} ${formatDate(b.start)}</div>
           <div class="card-meta">
             <span class="meta-item">${b.phone}</span>
-            <span class="meta-item">${b.email}</span>
+            <span class="meta-item" style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:bottom;cursor:pointer" title="${b.email}" onclick="this.style.whiteSpace=this.style.whiteSpace==='normal'?'nowrap':'normal';this.style.overflow=this.style.overflow==='visible'?'hidden':'visible'">${b.email}</span>
           </div>
           <div class="card-footer" style="flex-wrap:wrap;gap:0.5rem">
             <div class="people-badge">${iconPeople()} ${b.people} persona${b.people > 1 ? 's' : ''}</div>
@@ -3037,7 +3079,7 @@ function closeCancelPopupDirect() {
 
 // ── SINCRONIZACIÓN REMOTA ────────────────────────────────────
 const SYNC_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzL8YAkNml2YMPMEfu0AB8G1d4fgKbyWV1rhuI07fSMJRvRP1RlVhaR4vijDQNdcqln/exec';
-const SYNC_PREFIXES = ['confirmed_', 'cancelled_', 'deleted_', 'dismissed_nov_', 'time_override_', 'ct_review_', 'pending_change_'];
+const SYNC_PREFIXES = ['confirmed_', 'cancelled_', 'deleted_', 'dismissed_nov_', 'time_override_', 'ct_review_'];
 
 let _syncPaused = false;
 
@@ -3318,7 +3360,24 @@ let _timepickGuideAction = null;
 let _timepickWaUrlCristina = null;
 let _timepickWaUrlAurora = null;
 
-function buildTimepickWAUrl(who) {
+function buildTimepickChangeUrl() {
+  if (!_selectedSlots.size || _timePickIdx === null) return null;
+  const b = bookings[_timePickIdx];
+  const phone = b && b.phone ? b.phone.replace(/\s+/g, '') : '';
+  if (!phone) return null;
+  const nombre = b.name.split(' ')[0];
+  const [datePart] = b.start.split('T');
+  const overrideKey = timeOverrideKey(b);
+  const slotsParam  = [..._selectedSlots].sort().join(',');
+  return location.origin + location.pathname.replace('index.html','') + 'cambio.html'
+    + '?n=' + encodeURIComponent(nombre)
+    + '&o=' + encodeURIComponent(datePart)
+    + '&k=' + encodeURIComponent(overrideKey)
+    + '&s=' + encodeURIComponent(slotsParam)
+    + '&w=' + encodeURIComponent(phone);
+}
+
+function buildTimepickWAUrl(who, changeUrl) {
   if (!_selectedSlots.size || _timePickIdx === null) return null;
   const b = bookings[_timePickIdx];
   const phone = b && b.phone ? b.phone.replace(/\s+/g, '') : '';
@@ -3331,44 +3390,40 @@ function buildTimepickWAUrl(who) {
   const [y, mo, dd] = datePart.split('-');
   const dt = new Date(+y, +mo-1, +dd);
   const fechaOrig = datePart === todayStr ? 'hoy' : `${dias[dt.getDay()]} ${+dd} de ${meses[+mo-1]}`;
-  const centroByDate = {}, cantByDate = {};
-  [..._selectedSlots].sort().forEach(key => {
-    const [ds, hr, tour] = key.split('|');
-    if (tour === 'canteras') { if (!cantByDate[ds]) cantByDate[ds] = []; cantByDate[ds].push(hr); }
-    else                     { if (!centroByDate[ds]) centroByDate[ds] = []; centroByDate[ds].push(hr); }
-  });
-  function buildLines(byDate) {
-    let lines = '';
-    Object.entries(byDate).sort().forEach(([ds, hours]) => {
-      const d = new Date(ds + 'T00:00:00');
-      const diff = Math.round((d - new Date(new Date().toDateString())) / 86400000);
-      const lbl = diff === 0 ? 'Hoy' : diff === 1 ? 'Mañana'
-        : `${dias[d.getDay()].charAt(0).toUpperCase() + dias[d.getDay()].slice(1)} ${d.getDate()} de ${meses[d.getMonth()]}`;
-      const times = hours.length === 1 ? `a las ${hours[0]}` : `a las ${hours.slice(0,-1).join(', ')} o las ${hours[hours.length-1]}`;
-      lines += `• ${lbl}: ${times}\n`;
-    });
-    return lines;
-  }
-  const overrideKey = timeOverrideKey(b);
-  const slotsParam  = [..._selectedSlots].sort().join(',');
-  const changeUrl   = location.origin + location.pathname.replace('index.html','') + 'cambio.html'
-    + '?n=' + encodeURIComponent(nombre)
-    + '&o=' + encodeURIComponent(datePart)
-    + '&k=' + encodeURIComponent(overrideKey)
-    + '&s=' + encodeURIComponent(slotsParam)
-    + '&w=' + encodeURIComponent(phone);
   const msg = `Hola, ${nombre} 👋 Soy ${guia} de Cristitours.\n\nTe escribo sobre tu reserva del Free Tour de ${fechaOrig}. Necesito proponerte un cambio de horario.\n\nElige el hueco que mejor te venga aquí:\n👉 ${changeUrl}\n\nSi ninguna opción te viene bien, respóndeme y lo solucionamos 😊`;
   return 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
 }
 
 function timepickAskGuide(action) {
   _timepickGuideAction = action;
-  if (action === 'wa') {
-    _timepickWaUrlCristina = buildTimepickWAUrl('cristina');
-    _timepickWaUrlAurora   = buildTimepickWAUrl('aurora');
-  }
+  _timepickWaUrlCristina = null;
+  _timepickWaUrlAurora = null;
   const picker = document.getElementById('timepick-guide-picker');
-  if (picker) picker.style.display = 'block';
+  if (!picker) return;
+  picker.style.display = 'block';
+
+  if (action === 'wa') {
+    const btns = picker.querySelectorAll('button');
+    btns.forEach(btn => { btn.disabled = true; btn.style.opacity = '0.5'; });
+    const longUrl = buildTimepickChangeUrl();
+    const ac = new AbortController();
+    const tid = setTimeout(() => ac.abort(), 5000);
+    fetch('https://is.gd/create.php?format=json&url=' + encodeURIComponent(longUrl), { signal: ac.signal })
+      .then(r => r.json())
+      .then(data => {
+        clearTimeout(tid);
+        const shortUrl = data.shorturl || longUrl;
+        _timepickWaUrlCristina = buildTimepickWAUrl('cristina', shortUrl);
+        _timepickWaUrlAurora   = buildTimepickWAUrl('aurora', shortUrl);
+        btns.forEach(btn => { btn.disabled = false; btn.style.opacity = ''; });
+      })
+      .catch(() => {
+        clearTimeout(tid);
+        _timepickWaUrlCristina = buildTimepickWAUrl('cristina', longUrl);
+        _timepickWaUrlAurora   = buildTimepickWAUrl('aurora', longUrl);
+        btns.forEach(btn => { btn.disabled = false; btn.style.opacity = ''; });
+      });
+  }
 }
 
 function timepickOnGuideClick(e, who) {
@@ -3385,12 +3440,14 @@ function timepickOnGuideClick(e, who) {
 
   if (url) window.open(url, '_blank');
 
-  if (b && _selectedSlots.size) setPendingChange(b, [..._selectedSlots].sort());
+  if (action === 'call' && b && _selectedSlots.size) {
+    setPendingChange(b, [..._selectedSlots].sort());
+    setTimeout(checkPendingCalls, 800);
+  }
+
   const picker = document.getElementById('timepick-guide-picker');
   if (picker) picker.style.display = 'none';
-  renderPendingChanges();
   closeTimePick();
-  setTimeout(checkPendingOnLoad, 800);
 }
 
 function timepickCallPropose(who) {}
@@ -3417,9 +3474,7 @@ function saveTimePick(date, hour) {
   localStorage.setItem(k, JSON.stringify({ start: newStart, tour }));
   b.start = newStart;
   b.tour  = tour;
-  clearPendingChange(b);
   render();
-  renderPendingChanges();
   closeTimePick();
 }
 
@@ -3510,7 +3565,7 @@ function renderOpiniones() {
         <div class="card-date">${iconCalendar()} ${formatDate(b.start)}</div>
         <div class="card-meta">
           <span class="meta-item">${b.phone}</span>
-          <span class="meta-item">${b.email}</span>
+          <span class="meta-item" style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:bottom;cursor:pointer" title="${b.email}" onclick="this.style.whiteSpace=this.style.whiteSpace==='normal'?'nowrap':'normal';this.style.overflow=this.style.overflow==='visible'?'hidden':'visible'">${b.email}</span>
         </div>
         <div class="card-footer" style="flex-wrap:wrap;gap:0.5rem">
           <div class="people-badge">${iconPeople()} ${b.people} persona${b.people > 1 ? 's' : ''}</div>
@@ -3576,7 +3631,6 @@ function renderOpiniones() {
 function loadDemo() {
   window._demoMode = true;
   sessionStorage.setItem('_demoMode', '1');
-  closePcOverlay();
   const today = new Date();
   const fmt = (d) => d.toISOString().slice(0,10);
   const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
@@ -3643,7 +3697,7 @@ function dismissLoadingScreen() {
   screen.style.opacity = '0';
   setTimeout(() => { screen.style.display = 'none'; screen.style.opacity = '1'; }, 350);
   if (sessionStorage.getItem('_demoMode')) { loadDemo(); } else { render(); }
-  setTimeout(checkPendingOnLoad, 400);
+  setTimeout(checkPendingCalls, 400);
   setInterval(loadAll, 2 * 60 * 1000);
 }
 
@@ -3665,126 +3719,6 @@ function startLoadingScreen() {
 
 startLoadingScreen();
 
-// ── Popup de confirmación de cambio pendiente al arrancar ──────────────────
-function checkPendingOnLoad() {
-  const pending = bookings.filter(b =>
-    !isDeleted(b) && !isCancelled(b) && getPendingChange(b) &&
-    !localStorage.getItem('not_interested_' + bookingKey(b))
-  );
-  if (!pending.length) return;
-  _pcPendingList = pending;
-  _pcPendingIdx  = 0;
-  showNextPendingConfirm();
-}
-
-let _pcPendingList = [];
-let _pcPendingIdx  = 0;
-
-function showNextPendingConfirm() {
-  const pending = _pcPendingList.filter(b => !isDeleted(b) && !isCancelled(b) && getPendingChange(b));
-  if (!pending.length) { closePcOverlay(); return; }
-  _pcPendingList = pending;
-  _pcPendingIdx  = 0;
-
-  const b   = pending[0];
-  const pc  = getPendingChange(b);
-  const bi  = bookings.indexOf(b);
-  const nombre = toTitleCase(b.name.trim().split(/\s+/)[0]);
-  const DIAS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-  const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  const DC = ['dom','lun','mar','mié','jue','vie','sáb'];
-  const MC = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  const [datePart] = b.start.split('T');
-  const [yr, mo, dy] = datePart.split('-');
-  const dt = new Date(+yr, +mo-1, +dy);
-  const fechaOrig = datePart === todayStr ? 'hoy' : `${DIAS[dt.getDay()]} ${+dy} de ${MESES[+mo-1]}`;
-  const total = pending.length;
-  const counter = total > 1 ? `<span style="font-size:0.7rem;color:#94a3b8">${total} pendientes</span>` : '';
-
-  let slotsHtml = '';
-  (pc.slots || []).forEach((key, si) => {
-    const parts = key.split('|');
-    const ds = parts[0], hr = parts[1], tour = parts[2] || 'centro';
-    const d2 = new Date(ds + 'T00:00:00');
-    const diff = Math.round((d2 - new Date(new Date().toDateString())) / 86400000);
-    const lbl = diff === 0 ? 'Hoy' : diff === 1 ? 'Mañana'
-      : `${DC[d2.getDay()].charAt(0).toUpperCase() + DC[d2.getDay()].slice(1)} ${d2.getDate()} ${MC[d2.getMonth()]}`;
-    const isCan = tour === 'canteras';
-    const color  = isCan ? '#15803d' : '#1d4ed8';
-    const bg     = isCan ? '#dcfce7' : '#dbeafe';
-    const border = isCan ? '#86efac' : '#93c5fd';
-    const tourLbl = isCan ? 'Las Canteras' : 'Las Palmas';
-    slotsHtml += `<button onclick="pcConfirmSlot(${bi},${si})"
-      style="width:100%;padding:0.65rem 0.9rem;border-radius:10px;border:1.5px solid ${border};background:${bg};color:${color};font-size:0.9rem;font-weight:700;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center">
-      <span>${lbl} · ${hr}</span>
-      <span style="font-size:0.72rem;font-weight:500;opacity:0.75">${tourLbl}</span>
-    </button>`;
-  });
-  if (!slotsHtml) {
-    slotsHtml = `<div style="text-align:center;padding:0.5rem 0;color:#94a3b8;font-size:0.82rem">Pendiente antiguo sin horarios guardados.<br>Abre el diálogo de cambio y reenvía el WhatsApp.</div>
-    <button onclick="clearPendingChange(bookings[${bi}]);renderPendingChanges();showNextPendingConfirm()" style="width:100%;padding:0.6rem;border:1.5px solid #e2e8f0;border-radius:10px;background:white;color:#64748b;font-size:0.82rem;font-weight:600;cursor:pointer">Borrar pendiente</button>`;
-  }
-
-  let overlay = document.getElementById('pc-overlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'pc-overlay';
-    overlay.addEventListener('click', function(e) { if (e.target === overlay) closePcOverlay(); });
-    document.body.appendChild(overlay);
-  }
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:3000;display:flex;align-items:center;justify-content:center;padding:1.25rem';
-
-  overlay.innerHTML = `
-    <div style="background:white;border-radius:24px;width:100%;max-width:400px;display:flex;flex-direction:column;max-height:90vh;box-shadow:0 32px 80px rgba(0,0,0,0.3);animation:pcPopIn 0.22s cubic-bezier(.34,1.56,.64,1)">
-      <div style="padding:1.75rem 1.5rem 1.1rem;text-align:center">
-        <div style="width:52px;height:52px;background:#fef3c7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 0.9rem;font-size:1.5rem">⏳</div>
-        <div style="font-size:1.15rem;font-weight:800;color:#1a202c;margin-bottom:0.3rem">¿Cuál horario confirmó?</div>
-        <div style="font-size:0.88rem;color:#64748b"><strong style="color:#1a202c">${nombre}</strong> · reserva de ${fechaOrig}</div>
-        ${total > 1 ? `<div style="margin-top:0.5rem;display:inline-block;background:#f1f5f9;border-radius:99px;padding:0.2rem 0.7rem;font-size:0.7rem;color:#64748b;font-weight:600">${total} pendientes</div>` : ''}
-      </div>
-      <div style="padding:0 1.25rem 1rem;display:flex;flex-direction:column;gap:0.4rem;overflow-y:auto">${slotsHtml}</div>
-      <div style="padding:0.5rem 1.25rem;border-top:1px solid #f1f5f9;flex-shrink:0">
-        <button onclick="pcNotInterested(${bi})" style="width:100%;padding:0.7rem;border:none;border-radius:10px;background:#fef2f2;color:#dc2626;font-size:0.875rem;font-weight:600;cursor:pointer;margin-bottom:0.4rem">No está interesado — no preguntar más</button>
-        <button onclick="closePcOverlay()" style="width:100%;padding:0.7rem;border:1.5px solid #e2e8f0;border-radius:10px;background:white;color:#94a3b8;font-size:0.875rem;font-weight:600;cursor:pointer;margin-bottom:0.5rem">Más tarde</button>
-      </div>
-    </div>`;
-}
-
-function closePcOverlay() {
-  const el = document.getElementById('pc-overlay');
-  if (el) el.remove();
-}
-
-function pcConfirmSlot(bookingIdx, slotIdx) {
-  const b  = bookings[bookingIdx];
-  const pc = getPendingChange(b);
-  if (!pc || !pc.slots || !pc.slots[slotIdx]) return;
-  const parts = pc.slots[slotIdx].split('|');
-  const ds = parts[0], hr = parts[1], tour = parts[2] || b.tour || 'centro';
-  _timePickIdx = bookingIdx;
-  const k = timeOverrideKey(b);
-  localStorage.setItem(k, JSON.stringify({ start: ds + 'T' + hr, tour }));
-  b.start = ds + 'T' + hr;
-  b.tour  = tour;
-  clearPendingChange(b);
-  render();
-  renderPendingChanges();
-  showNextPendingConfirm();
-}
-
-function pcDismiss(bookingIdx) {
-  clearPendingChange(bookings[bookingIdx]);
-  renderPendingChanges();
-  showNextPendingConfirm();
-}
-
-function pcNotInterested(bookingIdx) {
-  const b = bookings[bookingIdx];
-  clearPendingChange(b);
-  localStorage.setItem('not_interested_' + bookingKey(b), '1');
-  renderPendingChanges();
-  showNextPendingConfirm();
-}
 </script>
 
 </body>
