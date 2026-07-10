@@ -25,100 +25,10 @@
     .ld-spinner { width:16px;height:16px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:ldSpin 0.7s linear infinite;flex-shrink:0 }
     .ld-check   { width:16px;height:16px;flex-shrink:0;animation:ldPop 0.35s ease forwards }
     .ld-row     { display:flex;align-items:center;gap:0.65rem;opacity:0;animation:ldRow 0.3s ease forwards }
-
-    #auth-screen {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      background: linear-gradient(160deg, #1a56db 0%, #1e40af 100%);
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2rem;
-    }
-
-    .auth-logo {
-      width: 72px;
-      height: 72px;
-      border-radius: 20px;
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    }
-
-    .auth-title {
-      color: white;
-      font-size: 1.35rem;
-      font-weight: 700;
-      text-align: center;
-      letter-spacing: -0.3px;
-    }
-
-    .auth-subtitle {
-      color: rgba(255,255,255,0.7);
-      font-size: 0.85rem;
-      text-align: center;
-      margin-top: 0.25rem;
-    }
-
-    .pin-dots {
-      display: flex;
-      gap: 1rem;
-      margin: 0.5rem 0;
-    }
-
-    .pin-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.5);
-      background: transparent;
-      transition: background 0.15s, border-color 0.15s;
-    }
-
-    .pin-dot.filled {
-      background: white;
-      border-color: white;
-    }
-
-    #pin-error {
-      color: #fca5a5;
-      font-size: 0.8rem;
-      font-weight: 600;
-      opacity: 0;
-      transition: opacity 0.2s;
-      height: 1rem;
-    }
-
-    .pin-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 72px);
-      gap: 0.75rem;
-    }
-
-    .pin-btn {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(255,255,255,0.15);
-      color: white;
-      font-size: 1.5rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.12s;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .pin-btn:active { background: rgba(255,255,255,0.3); }
-
-    .pin-btn.del {
-      background: transparent;
-      font-size: 1rem;
-    }
+    @keyframes ldDance { 0%{transform:rotate(-7deg) translateY(0)} 25%{transform:rotate(7deg) translateY(-7px) scaleX(0.97)} 50%{transform:rotate(-5deg) translateY(0)} 75%{transform:rotate(6deg) translateY(-5px) scaleX(0.97)} 100%{transform:rotate(-7deg) translateY(0)} }
+    @keyframes ldNote  { 0%{opacity:0;transform:translateY(0) scale(0.8)} 30%{opacity:0.9;transform:translateY(-10px) scale(1)} 70%{opacity:0.6;transform:translateY(-20px) scale(1)} 100%{opacity:0;transform:translateY(-30px) scale(0.8)} }
+    .ld-dancer { width:90px;height:90px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid rgba(255,255,255,0.4);box-shadow:0 4px 20px rgba(0,0,0,0.25);animation:ldDance 0.9s ease-in-out infinite;transform-origin:bottom center;display:block }
+    .ld-note   { position:absolute;font-size:1.1rem;animation:ldNote 1.8s ease-in-out infinite;opacity:0;pointer-events:none }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -645,137 +555,6 @@
     }
     .card-delete-btn:hover { color: #e11d48; }
 
-    .cal-wrap { padding: 0.75rem 1rem 1rem; }
-
-    .cal-nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.875rem;
-    }
-
-    .cal-nav button {
-      background: none;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      width: 32px; height: 32px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      color: #475569;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    .cal-nav button:hover { background: #f1f5f9; }
-
-    .cal-month-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #1a202c;
-    }
-
-    .cal-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 3px;
-    }
-
-    .cal-dow {
-      text-align: center;
-      font-size: 0.6rem;
-      font-weight: 700;
-      color: #94a3b8;
-      text-transform: uppercase;
-      padding-bottom: 0.35rem;
-    }
-
-    .cal-cell {
-      min-height: 58px;
-      border-radius: 8px;
-      padding: 5px 4px 4px;
-      background: white;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-      overflow: hidden;
-    }
-
-    .cal-cell.empty {
-      background: none;
-      box-shadow: none;
-    }
-
-    .cal-cell-num {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: #94a3b8;
-      line-height: 1;
-      margin-bottom: 3px;
-      width: 18px; height: 18px;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    .cal-cell.is-today .cal-cell-num {
-      background: #1a56db;
-      color: white;
-      border-radius: 50%;
-      font-weight: 700;
-    }
-
-    .cal-cell.has-booking .cal-cell-num {
-      color: #1a202c;
-    }
-
-    .cal-booking-chip {
-      font-size: 0.58rem;
-      font-weight: 600;
-      border-radius: 3px;
-      padding: 1px 3px;
-      margin-bottom: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      line-height: 1.5;
-      cursor: pointer;
-      display: block;
-    }
-
-    .cal-booking-chip:hover { filter: brightness(0.92); }
-
-    .cal-booking-chip.centro {
-      background: #dbeafe;
-      color: #1d4ed8;
-      border-left: 2px solid #3b82f6;
-    }
-
-    .cal-booking-chip.canteras {
-      background: #dcfce7;
-      color: #15803d;
-      border-left: 2px solid #22c55e;
-    }
-
-    .cal-booking-chip.portugues {
-      background: #fed7aa;
-      color: #c2410c;
-      border-left: 2px solid #f97316;
-    }
-
-    .cal-booking-chip.past {
-      opacity: 0.4;
-    }
-
-    .cal-booking-chip { display: flex; align-items: center; gap: 2px; }
-
-    .cal-tick {
-      display: inline-flex;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .cal-tick.unconfirmed { color: #f59e0b; text-decoration: none; }
-    .cal-tick.confirmed   { color: #16a34a; }
-    .cal-tick.past-tick   { color: #94a3b8; }
-
-    .cal-booking-chip { cursor: pointer; }
-    .cal-booking-chip:hover { filter: brightness(0.93); }
-
     /* Popup */
     .popup-overlay {
       position: fixed;
@@ -864,18 +643,19 @@
     @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
     @keyframes fadeOut { from { opacity:1 } to { opacity:0 } }
     @keyframes slideUp   { from { transform: translateY(100%) } to { transform: translateY(0) } }
-    @keyframes taskPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(225,29,72,0.5) } 50% { box-shadow: 0 0 0 6px rgba(225,29,72,0) } }
     @keyframes badgePop  { 0% { transform:scale(0.6) } 70% { transform:scale(1.2) } 100% { transform:scale(1) } }
-    #tasks-urgency-bar { animation: slideDown 0.35s ease; }
     @keyframes slideDown { from { opacity:0; transform:translateY(-8px) } to { opacity:1; transform:none } }
     @keyframes slideDown { from { transform: translateY(0) } to { transform: translateY(100%) } }
   </style>
 </head>
 <body>
 
-<div id="loading-screen" style="display:flex;position:fixed;inset:0;z-index:10000;background:linear-gradient(160deg,#1a56db 0%,#1e40af 100%);flex-direction:column;align-items:center;justify-content:center;gap:2rem">
-  <div style="width:72px;height:72px;border-radius:20px;background:white;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,0.2)">
-    <img src="Cristitours.png" width="48" height="48" style="border-radius:12px;object-fit:cover" />
+<div id="loading-screen" style="display:flex;position:fixed;inset:0;z-index:10000;background:linear-gradient(160deg,#1a56db 0%,#1e40af 100%);flex-direction:column;align-items:center;justify-content:center;gap:1.5rem">
+  <div style="position:relative;margin-bottom:0.25rem">
+    <img class="ld-dancer" src="Cristitours.png" alt="Cristina">
+    <span class="ld-note" style="top:-8px;right:-14px;animation-delay:0s">🎵</span>
+    <span class="ld-note" style="top:10px;left:-18px;animation-delay:0.6s">🎶</span>
+    <span class="ld-note" style="top:-14px;left:10px;animation-delay:1.1s">♪</span>
   </div>
   <div style="text-align:center">
     <div style="color:white;font-size:1.35rem;font-weight:700;letter-spacing:-0.3px">Cristitours</div>
@@ -900,38 +680,6 @@
   </div>
 </div>
 
-<div id="auth-screen">
-  <div class="auth-logo">
-    <img src="Cristitours.png" width="48" height="48" style="border-radius:12px;object-fit:cover" />
-  </div>
-  <div>
-    <div class="auth-title">Cristitours</div>
-    <div class="auth-subtitle">Introduce tu PIN para continuar</div>
-  </div>
-  <div id="pin-display" data-value="">
-    <div class="pin-dots">
-      <div class="pin-dot"></div>
-      <div class="pin-dot"></div>
-      <div class="pin-dot"></div>
-      <div class="pin-dot"></div>
-    </div>
-  </div>
-  <div id="pin-error">PIN incorrecto</div>
-  <div class="pin-grid">
-    <button class="pin-btn" onclick="authInput('1')">1</button>
-    <button class="pin-btn" onclick="authInput('2')">2</button>
-    <button class="pin-btn" onclick="authInput('3')">3</button>
-    <button class="pin-btn" onclick="authInput('4')">4</button>
-    <button class="pin-btn" onclick="authInput('5')">5</button>
-    <button class="pin-btn" onclick="authInput('6')">6</button>
-    <button class="pin-btn" onclick="authInput('7')">7</button>
-    <button class="pin-btn" onclick="authInput('8')">8</button>
-    <button class="pin-btn" onclick="authInput('9')">9</button>
-    <div></div>
-    <button class="pin-btn" onclick="authInput('0')">0</button>
-    <button class="pin-btn del" onclick="authDelete()">⌫</button>
-  </div>
-</div>
 
 <header>
   <div style="display:flex;align-items:center;gap:1rem">
@@ -944,15 +692,9 @@
     <button onclick="location.reload()" title="Actualizar" style="background:rgba(255,255,255,0.15);border:none;border-radius:12px;padding:0.5rem 0.65rem;cursor:pointer;color:white;display:flex;align-items:center;flex-shrink:0">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
     </button>
-    <button id="tasks-header-btn" onclick="openTasksPanel()" style="position:relative;background:rgba(255,255,255,0.15);border:none;border-radius:12px;padding:0.5rem 0.65rem;cursor:pointer;color:white;display:flex;align-items:center;gap:0.35rem;font-size:0.8rem;font-weight:600;flex-shrink:0">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      Tareas
-      <span id="tasks-badge" style="display:none;position:absolute;top:-6px;right:-6px;background:#e11d48;color:white;font-size:0.65rem;font-weight:700;border-radius:99px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #1a56db">0</span>
-    </button>
   </div>
 </header>
 
-<div id="tasks-urgency-bar" style="display:none;cursor:pointer" onclick="openTasksPanel()"></div>
 
 <div id="demo-banner" style="display:none;background:#f59e0b;color:#fff;text-align:center;font-size:0.8rem;font-weight:700;padding:0.4rem;letter-spacing:0.5px">
   MODO DEMO — Los datos son de ejemplo
@@ -960,19 +702,20 @@
 </div>
 
 <div class="filter-bar">
-  <button class="filter-btn active" data-group="time" data-val="all" onclick="setFilter('all')">Todas</button>
-  <button class="filter-btn" data-group="time" data-val="today" onclick="setFilter('today')">Hoy</button>
-  <button class="filter-btn" data-group="time" data-val="tomorrow" onclick="setFilter('tomorrow')">Mañana</button>
-  <button class="filter-btn" data-group="time" data-val="calendar" onclick="setFilter('calendar')">Calendario</button>
-  <button class="filter-btn" data-group="time" data-val="past" onclick="setFilter('past')">Pasadas</button>
+  <button class="filter-btn active" data-group="time" data-val="tours" onclick="setFilter('tours')">🗓 Tours</button>
+  <button id="opiniones-btn" class="filter-btn" data-group="time" data-val="opiniones" onclick="setFilter('opiniones')">★ Opiniones</button>
+  <button class="filter-btn" data-group="time" data-val="all" onclick="setFilter('all')">Todas</button>
   <button class="filter-btn" data-group="time" data-val="cancelled" onclick="setFilter('cancelled')">Canceladas</button>
   <span style="color:#e2e8f0;font-size:1rem;line-height:1;align-self:center">|</span>
-  <button id="opiniones-btn" class="filter-btn" data-group="time" data-val="opiniones" onclick="setFilter('opiniones')" style="color:#b0bac7;font-size:0.78rem">★ Opiniones</button>
   <button class="filter-btn" data-group="time" data-val="rendimiento" onclick="setFilter('rendimiento')" style="color:#b0bac7;font-size:0.78rem">📊 Rendimiento</button>
+  <button class="filter-btn" data-group="time" data-val="estimacion" onclick="setFilter('estimacion')" style="color:#b0bac7;font-size:0.78rem">📈 Estimación</button>
+  <span style="color:#e2e8f0;font-size:1rem;line-height:1;align-self:center">|</span>
+  <button onclick="forceSyncNow(this)" style="background:none;border:none;color:#94a3b8;font-size:0.82rem;cursor:pointer;padding:0.25rem 0.5rem;border-radius:6px" title="Sincronizar ahora">⟳</button>
 </div>
 
 <div id="today-banner"></div>
 <div id="novedades"></div>
+<div id="pending-changes"></div>
 <div id="app"></div>
 <div id="nophone-overlay" onclick="closeNoPhone(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1003;align-items:center;justify-content:center">
   <div onclick="event.stopPropagation()" style="background:white;border-radius:16px;padding:1.5rem;max-width:310px;width:88%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
@@ -1061,12 +804,19 @@
   </div>
 </div>
 
-<div id="tasks-overlay" class="cancel-popup-overlay" style="display:none" onclick="closeTasksPanel(event)">
-  <div class="cancel-popup-sheet" style="max-height:85vh;overflow-y:auto">
-    <div class="popup-handle"></div>
-    <div id="tasks-content"></div>
+<!-- Cambiar hora -->
+<div id="timepick-overlay" onclick="closeTimePick(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1010;align-items:flex-end;justify-content:center">
+  <div id="timepick-sheet" onclick="event.stopPropagation()" style="background:white;border-radius:20px 20px 0 0;width:100%;max-width:480px;box-shadow:0 -4px 24px rgba(0,0,0,0.12);max-height:85vh;display:flex;flex-direction:column">
+    <div style="padding:1rem 1.25rem 0;flex-shrink:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <div style="width:36px;height:4px;border-radius:99px;background:#e2e8f0;margin:0 auto"></div>
+        <button onclick="closeTimePick()" style="position:absolute;right:1.25rem;background:none;border:none;font-size:1.3rem;color:#94a3b8;cursor:pointer;line-height:1;padding:0.2rem">✕</button>
+      </div>
+    </div>
+    <div id="timepick-content" style="overflow-y:auto;padding:0 1.25rem 2.5rem;flex:1"></div>
   </div>
 </div>
+
 
 <div id="popup-overlay" class="popup-overlay" style="display:none" onclick="closePopup(event)">
   <div class="popup-sheet">
@@ -1137,13 +887,13 @@ function loadOTABookings() {
   window._otaTimeout = setTimeout(() => {
     // Timeout: avanza la UI pero mantiene _loadingOTA para procesar datos si llegan tarde
     console.warn('OTA timeout');
-    onDataReady(); render();
+    onDataReady(); if (!window._demoMode) render();
   }, 8000);
   script.onerror = () => {
     clearTimeout(window._otaTimeout);
     window._loadingOTA = false;
     dbg('OTA: ERROR al cargar');
-    onDataReady(); render();
+    onDataReady(); if (!window._demoMode) render();
   };
   script.src = `https://docs.google.com/spreadsheets/d/${OTA_SHEET_ID}/gviz/tq?tqx=out:json&sheet=${OTA_SHEET_NAME}&t=${Date.now()}`;
   document.head.appendChild(script);
@@ -1222,7 +972,8 @@ function parseOTA(json) {
     const source = fuenteRaw.includes('civitatis') ? 'civitatis' : fuenteRaw.includes('guruwalk') ? 'guruwalk' : 'web';
     const name    = c[3] && c[3].v ? String(c[3].v).trim() : '';
     if (!name) return;
-    const people   = c[4] && c[4].v != null ? parseInt(c[4].v) || 1 : 1;
+    const peopleRaw = c[4] && c[4].v != null ? String(c[4].v) : '1';
+    const people = parseInt(peopleRaw.replace(/\D+/g,'')) || 1;
     const tourRaw  = c[5] && c[5].v ? String(c[5].v).trim() : '';
     const fechaTour = parseGvizDateOTA(c[6]);
     if (!fechaTour && !otaCancelled) return;
@@ -1259,18 +1010,19 @@ window.google = { visualization: { Query: { setResponse: function(json) {
       }
       window._otaRetries = 0;
       if (parsed.length > 0) otaBookingsCache = parsed;
-      // Rebuild bookings: web + OTA cache
-      const webOnly = bookings.filter(b => b.source === 'web');
-      bookings = [...webOnly, ...otaBookingsCache];
-      bookings.sort((a, b) => a.start.localeCompare(b.start));
+      if (!window._demoMode) {
+        const webOnly = bookings.filter(b => b.source === 'web');
+        bookings = [...webOnly, ...otaBookingsCache];
+        bookings.sort((a, b) => a.start.localeCompare(b.start));
+      }
       dbg('OTA: ' + otaBookingsCache.length + ' reservas');
       updateStats();
       onDataReady();
-      render();
+      if (!window._demoMode) render();
       const now = new Date();
       document.getElementById('footer-text').textContent =
         `Actualizado desde Google Sheets · ${now.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'})}`;
-    } catch(e) { console.error('Error OTA:', e); onDataReady(); render(); }
+    } catch(e) { console.error('Error OTA:', e); onDataReady(); if (!window._demoMode) render(); }
     return;
   }
   // Si estamos cargando datos de Ads, redirigir al handler de Ads
@@ -1288,12 +1040,12 @@ window.google = { visualization: { Query: { setResponse: function(json) {
     loadedCount++;
     if (loadedCount === SHEETS.length) {
       const webBookings = [...(pendingData['centro']||[]), ...(pendingData['canteras']||[]), ...(pendingData['portugues']||[])];
-      // Merge with cached OTA so they're visible immediately while new OTA loads
-      bookings = [...webBookings, ...otaBookingsCache];
-      bookings.sort((a, b) => a.start.localeCompare(b.start));
+      if (!window._demoMode) {
+        bookings = [...webBookings, ...otaBookingsCache];
+        bookings.sort((a, b) => a.start.localeCompare(b.start));
+      }
       onWebLoaded();
-      loadOTABookings();
-      loadRatings();
+      if (!window._demoMode) { loadOTABookings(); loadRatings(); }
       const now = new Date();
       document.getElementById('footer-text').textContent =
         `Actualizado desde Google Sheets · ${now.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'})}`;
@@ -1319,6 +1071,7 @@ function loadSheet(sheetDef) {
 }
 
 async function loadAll() {
+  if (window._demoMode) return;
   document.getElementById('app').innerHTML = '<div class="empty">Cargando reservas...</div>';
   loadedCount = 0;
   window._otaRetries = 0;
@@ -1347,7 +1100,7 @@ function parseGviz(json, tour) {
 
     const phone = cellStr(c[5]);
     const email = cellStr(c[6]);
-    const people = (c[7] && c[7].v != null) ? parseInt(c[7].v) || 1 : 1;
+    const people = (c[7] && c[7].v != null) ? (parseInt(String(c[7].v).replace(/\D+/g,'')) || 1) : 1;
     const booked = parseDate(c[8]) ? parseDate(c[8]).slice(0,10) : '';
 
     const key = tour + name + start + email;
@@ -1386,6 +1139,15 @@ function parseDate(cell) {
     const y = m1[3], mo = m1[1].padStart(2,'0'), d = m1[2].padStart(2,'0');
     const h = (m1[4]||'0').padStart(2,'0'), mi = (m1[5]||'00').padStart(2,'0');
     return `${y}-${mo}-${d}T${h}:${mi}`;
+  }
+  // Format ISO with timezone offset: 2026-06-14T15:00:00+01:00
+  const m3 = f.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})(?::\d{2})?([+-])(\d{2}):(\d{2})/);
+  if (m3) {
+    const [, date, h, mi, sign, offH, offM] = m3;
+    const totalMins = (+h * 60 + +mi) + (sign === '+' ? 1 : -1) * (+offH * 60 + +offM);
+    const adjH = Math.floor(((totalMins % 1440) + 1440) % 1440 / 60);
+    const adjM = ((totalMins % 60) + 60) % 60;
+    return `${date}T${String(adjH).padStart(2,'0')}:${String(adjM).padStart(2,'0')}`;
   }
   // Format YYYY-MM-DD HH:MM
   const m2 = f.match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})/);
@@ -1484,8 +1246,115 @@ function renderNovedades() {
   el.innerHTML = html;
 }
 
+// --- Pending change proposals (solo llamadas) ---
+function pendingChangeKey(b) { return 'pending_change_' + bookingKey(b); }
+function setPendingChange(b, slots) { localStorage.setItem(pendingChangeKey(b), JSON.stringify({ slots, sentAt: Date.now() })); }
+function clearPendingChange(b) { localStorage.removeItem(pendingChangeKey(b)); }
+function getPendingChange(b) { try { const v = localStorage.getItem(pendingChangeKey(b)); return v ? JSON.parse(v) : null; } catch { return null; } }
+
+function checkPendingCalls() {
+  const pending = bookings.filter(b => !isDeleted(b) && !isCancelled(b) && getPendingChange(b));
+  if (!pending.length) return;
+  showPendingCallConfirm(pending[0]);
+}
+
+function showPendingCallConfirm(b) {
+  const pc = getPendingChange(b);
+  if (!pc || !pc.slots || !pc.slots.length) { clearPendingChange(b); return; }
+  const bi = bookings.indexOf(b);
+  const nombre = toTitleCase(b.name.trim().split(/\s+/)[0]);
+  const DIAS  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const DC = ['dom','lun','mar','mié','jue','vie','sáb'];
+  const MC = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+
+  let slotsHtml = '';
+  pc.slots.forEach((key, si) => {
+    const [ds, hr, tour] = key.split('|');
+    const d2 = new Date(ds + 'T00:00:00');
+    const diff = Math.round((d2 - new Date(new Date().toDateString())) / 86400000);
+    const lbl = diff === 0 ? 'Hoy' : diff === 1 ? 'Mañana'
+      : `${DC[d2.getDay()].charAt(0).toUpperCase() + DC[d2.getDay()].slice(1)} ${d2.getDate()} ${MC[d2.getMonth()]}`;
+    const isCan = tour === 'canteras';
+    const color = isCan ? '#15803d' : '#1d4ed8';
+    const bg    = isCan ? '#dcfce7' : '#dbeafe';
+    const border= isCan ? '#86efac' : '#93c5fd';
+    const tourLbl = isCan ? 'Las Canteras' : 'Las Palmas';
+    slotsHtml += `<button onclick="pcCallConfirm(${bi},${si})"
+      style="width:100%;padding:0.65rem 0.9rem;border-radius:10px;border:1.5px solid ${border};background:${bg};color:${color};font-size:0.9rem;font-weight:700;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">
+      <span>${lbl} · ${hr}</span>
+      <span style="font-size:0.72rem;font-weight:500;opacity:0.75">${tourLbl}</span>
+    </button>`;
+  });
+
+  let overlay = document.getElementById('pc-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'pc-overlay';
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closePcOverlay(); });
+    document.body.appendChild(overlay);
+  }
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:3000;display:flex;align-items:center;justify-content:center;padding:1.25rem';
+  overlay.innerHTML = `
+    <div style="background:white;border-radius:24px;width:100%;max-width:400px;box-shadow:0 32px 80px rgba(0,0,0,0.3)">
+      <div style="padding:1.75rem 1.5rem 1rem;text-align:center">
+        <div style="width:52px;height:52px;background:#dbeafe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 0.9rem;font-size:1.5rem">📞</div>
+        <div style="font-size:1.1rem;font-weight:800;color:#1a202c;margin-bottom:0.3rem">¿Qué horario confirmó?</div>
+        <div style="font-size:0.85rem;color:#64748b"><strong>${nombre}</strong> acordó por llamada</div>
+      </div>
+      <div style="padding:0 1.25rem 0.5rem">${slotsHtml}</div>
+      <div style="padding:0.75rem 1.25rem;border-top:1px solid #f1f5f9">
+        <button onclick="closePcOverlay()" style="width:100%;padding:0.7rem;border:1.5px solid #e2e8f0;border-radius:10px;background:white;color:#94a3b8;font-size:0.875rem;font-weight:600;cursor:pointer">Más tarde</button>
+      </div>
+    </div>`;
+}
+
+function pcCallConfirm(bookingIdx, slotIdx) {
+  const b  = bookings[bookingIdx];
+  const pc = getPendingChange(b);
+  if (!pc || !pc.slots[slotIdx]) return;
+  const [ds, hr, tour] = pc.slots[slotIdx].split('|');
+  const k = timeOverrideKey(b);
+  localStorage.setItem(k, JSON.stringify({ start: ds + 'T' + hr, tour: tour || b.tour }));
+  b.start = ds + 'T' + hr;
+  b.tour  = tour || b.tour;
+  clearPendingChange(b);
+  closePcOverlay();
+  render();
+}
+
+function closePcOverlay() {
+  const el = document.getElementById('pc-overlay');
+  if (el) el.remove();
+}
+
+function confirmPendingSlot(idx, dateStr, hour) {
+  const b = bookings[idx];
+  _timePickIdx = idx;
+  const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const d = new Date(dateStr + 'T00:00:00');
+  const diffDays = Math.round((d - new Date(new Date().toDateString())) / 86400000);
+  const dayLabel = diffDays === 0 ? 'Hoy' : diffDays === 1 ? 'Mañana'
+    : `${dias[d.getDay()].charAt(0).toUpperCase() + dias[d.getDay()].slice(1)} ${d.getDate()} de ${meses[d.getMonth()]}`;
+
+  document.getElementById('timepick-content').innerHTML = `
+    <div style="text-align:center;margin-bottom:1.25rem">
+      <div style="font-size:1.75rem;margin-bottom:0.4rem">📅</div>
+      <div style="font-size:1rem;font-weight:700;color:#1a202c;margin-bottom:0.2rem">Confirmar cambio</div>
+      <div style="font-size:0.85rem;color:#64748b">${b.name}</div>
+    </div>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:1rem;text-align:center;margin-bottom:1.25rem">
+      <div style="font-size:1.1rem;font-weight:800;color:#15803d">${dayLabel} · ${hour}</div>
+    </div>
+    <div style="display:flex;gap:0.5rem">
+      <button onclick="closeTimePick()" style="flex:1;padding:0.75rem;border:1.5px solid #e2e8f0;border-radius:10px;background:white;color:#64748b;font-size:0.875rem;font-weight:600;cursor:pointer">Cancelar</button>
+      <button onclick="saveTimePick('${dateStr}','${hour}')" style="flex:2;padding:0.75rem;border:none;border-radius:10px;background:linear-gradient(135deg,#15803d,#166534);color:white;font-size:0.875rem;font-weight:700;cursor:pointer">Guardar cambio</button>
+    </div>`;
+  document.getElementById('timepick-overlay').style.display = 'flex';
+}
+
 function updateStats() {
-  updateTasksBadge();
   renderNovedades();
 }
 
@@ -1496,106 +1365,15 @@ const todayStr = `${TODAY.getFullYear()}-${String(TODAY.getMonth()+1).padStart(2
 const _tmr = new Date(TODAY); _tmr.setDate(_tmr.getDate() + 1);
 const tomorrowStr = `${_tmr.getFullYear()}-${String(_tmr.getMonth()+1).padStart(2,'0')}-${String(_tmr.getDate()).padStart(2,'0')}`;
 
-let currentFilter = 'all';
+let currentFilter = 'tours';
 let currentTour = 'all';
-let calYear = TODAY.getFullYear();
-let calMonth = TODAY.getMonth();
-let calSelectedDay = null;
 
-function setFilter(f) {
-  currentFilter = f;
+function setFilter(val) {
+  currentFilter = val;
   document.querySelectorAll('.filter-btn[data-group="time"]').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.val === f);
+    btn.classList.toggle('active', btn.dataset.val === val);
   });
-  if (f === 'calendar') {
-    calYear = TODAY.getFullYear();
-    calMonth = TODAY.getMonth();
-    calSelectedDay = null;
-  }
   render();
-}
-
-function calPrev() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } calSelectedDay = null; renderCalendar(); }
-function calNext() { calMonth++; if (calMonth > 11) { calMonth = 0;  calYear++; } calSelectedDay = null; renderCalendar(); }
-
-function calSelectDay(dateStr) {
-  calSelectedDay = calSelectedDay === dateStr ? null : dateStr;
-  renderCalendar();
-}
-
-function renderCalendar() {
-  const app = document.getElementById('app');
-  const mesesCal = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const dowLabels = ['L','M','X','J','V','S','D'];
-
-  const byDay = {};
-  bookings.forEach(b => {
-    const d = b.start.slice(0, 10);
-    if (!byDay[d]) byDay[d] = [];
-    byDay[d].push(b);
-  });
-
-  const firstDay = new Date(calYear, calMonth, 1);
-  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  let startDow = firstDay.getDay() - 1;
-  if (startDow < 0) startDow = 6;
-
-  // DOW header + day cells en un solo grid
-  let gridHtml = '';
-  dowLabels.forEach(d => { gridHtml += `<div class="cal-dow">${d}</div>`; });
-
-  // Empty cells before first day
-  for (let i = 0; i < startDow; i++) gridHtml += `<div class="cal-cell empty"></div>`;
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const mo = String(calMonth + 1).padStart(2, '0');
-    const dd = String(day).padStart(2, '0');
-    const dateStr = `${calYear}-${mo}-${dd}`;
-    const dayBookings = byDay[dateStr] || [];
-    const isToday = dateStr === todayStr;
-    const hasBooking = dayBookings.length > 0;
-
-    let chips = '';
-    dayBookings.forEach(b => {
-      const isPast = getStatus(b.start) === 'past';
-      const shortName = toTitleCase(b.name.trim().split(/\s+/)[0]);
-      const time = b.start.slice(11, 16);
-      const idx = bookings.indexOf(b);
-      const confirmed = isConfirmed(b);
-      const tickIcon = confirmed
-        ? `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
-        : `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>`;
-      // Si no está confirmada y no es pasada, el tick lleva a WhatsApp
-      const tickHtml = (!isPast && !confirmed)
-        ? `<span class="cal-tick unconfirmed">${tickIcon}</span>`
-        : `<span class="cal-tick ${confirmed ? 'confirmed' : 'past-tick'}">${tickIcon}</span>`;
-      const srcLabel = b.source === 'guruwalk' ? ' · GW' : b.source === 'civitatis' ? ' · CV' : '';
-      chips += `<div class="cal-booking-chip ${b.tour}${isPast ? ' past' : ''}" onclick="event.stopPropagation();openPopup(${idx})">${tickHtml}${time} ${shortName}${srcLabel}</div>`;
-    });
-
-    gridHtml += `
-      <div class="cal-cell${isToday ? ' is-today' : ''}${hasBooking ? ' has-booking' : ''}">
-        <div class="cal-cell-num">${day}</div>
-        ${chips}
-      </div>`;
-  }
-
-  app.innerHTML = `
-    <div class="cal-wrap">
-      <div class="cal-nav">
-        <button onclick="calPrev()">‹</button>
-        <div class="cal-month-title">${mesesCal[calMonth]} ${calYear}</div>
-        <button onclick="calNext()">›</button>
-      </div>
-      <div class="cal-grid">${gridHtml}</div>
-    </div>`;
-}
-
-function getWeekNumber(d) {
-  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
-  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
 }
 
 function setTour(t) {
@@ -1639,7 +1417,8 @@ function bookingKey(b) {
 }
 
 function isConfirmed(b) {
-  return localStorage.getItem(bookingKey(b)) === '1';
+  const v = localStorage.getItem(bookingKey(b));
+  return v !== null && v !== '' && v !== '0';
 }
 
 function cancelledKey(b) {
@@ -1647,7 +1426,8 @@ function cancelledKey(b) {
 }
 
 function isCancelled(b) {
-  return b.otaCancelled === true || localStorage.getItem(cancelledKey(b)) === '1';
+  const v = localStorage.getItem(cancelledKey(b));
+  return b.otaCancelled === true || (v !== null && v !== '' && v !== '0');
 }
 
 function deletedKey(b) {
@@ -1655,7 +1435,8 @@ function deletedKey(b) {
 }
 
 function isDeleted(b) {
-  return localStorage.getItem(deletedKey(b)) === '1';
+  const v = localStorage.getItem(deletedKey(b));
+  return v !== null && v !== '' && v !== '0';
 }
 
 let _manualConfirmIdx = null;
@@ -1708,15 +1489,62 @@ function guruWalkChangeWA() {
   const b = _gwCancelBooking;
   const phone = b.phone.replace(/\s+/g, '');
   const nombre = toTitleCase(b.name.trim().split(/\s+/)[0]);
-  const [datePart, timePart] = b.start.split('T');
+  const [datePart] = b.start.split('T');
   const [y, mo, d] = datePart.split('-');
   const dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
   const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const dt = new Date(+y, +mo-1, +d);
-  const fechaMsg = `${dias[dt.getDay()]} ${+d} de ${meses[+mo-1]}`;
-  const msg = `Hola, ${nombre} 👋 Soy Cristina de Cristitours.\n\nTe escribo sobre tu reserva del Free Tour del ${fechaMsg}. Necesitaríamos proponerte un cambio de horario.\n\n¿Te vendría bien a las [HORA]? Quedo pendiente de tu respuesta 😊`;
-  window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+  const fechaMsg = datePart === todayStr
+    ? 'hoy'
+    : `${dias[dt.getDay()]} ${+d} de ${meses[+mo-1]}`;
+
   document.getElementById('guruwalk-cancel-overlay').style.display = 'none';
+
+  loadElfsightSchedule(function(settings) {
+    const now = new Date();
+    const nowHHMM = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    let slotsLines = '';
+    let daysShown = 0;
+    for (let i = 0; i < 5 && daysShown < 3; i++) {
+      const date = new Date(now);
+      date.setDate(date.getDate() + i);
+      const dateStr = date.toISOString().slice(0, 10);
+      const slots = getElfsightSlotsForDate(settings, dateStr);
+      const filtered = i === 0 ? slots.filter(h => h > nowHHMM) : slots;
+      if (!filtered.length) continue;
+      const dayLabel = i === 0 ? 'hoy' : i === 1 ? 'mañana' : `${dias[date.getDay()]} ${date.getDate()} de ${meses[date.getMonth()]}`;
+      const times = filtered.length === 1 ? `a las ${filtered[0]}` : `a las ${filtered.slice(0,-1).join(', ')} o las ${filtered[filtered.length-1]}`;
+      slotsLines += `• ${dayLabel.charAt(0).toUpperCase() + dayLabel.slice(1)}: ${times}\n`;
+      daysShown++;
+    }
+    const centroSection = slotsLines
+      ? `Tengo disponibilidad en:\n\n${slotsLines}`
+      : 'Tengo disponibilidad en otros horarios próximos.';
+    const baseMsg = `Hola, ${nombre} 👋 Soy Cristina de Cristitours.\n\nTe escribo sobre tu reserva del Free Tour de ${fechaMsg}. Necesito proponerte un cambio de horario.\n\n${centroSection}`;
+
+    loadElfsightCanterasSchedule(function(canSettings) {
+      let canLines = '';
+      let canDays = 0;
+      const diasW = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+      const mesesW = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+      for (let i = 0; i < 7 && canDays < 3; i++) {
+        const date = new Date(now);
+        date.setDate(date.getDate() + i);
+        const dateStr = date.toISOString().slice(0, 10);
+        const slots = getElfsightSlotsForDate(canSettings, dateStr);
+        const filtered = i === 0 ? slots.filter(h => h > nowHHMM) : slots;
+        if (!filtered.length) continue;
+        canDays++;
+        const dayLabel = i === 0 ? 'Hoy' : i === 1 ? 'Mañana'
+          : `${diasW[date.getDay()].charAt(0).toUpperCase() + diasW[date.getDay()].slice(1)} ${date.getDate()} de ${mesesW[date.getMonth()]}`;
+        const times = filtered.length === 1 ? `a las ${filtered[0]}` : `a las ${filtered.slice(0,-1).join(', ')} o las ${filtered[filtered.length-1]}`;
+        canLines += `• ${dayLabel}: ${times}\n`;
+      }
+      const canSection = canLines ? `\n\nAdemás, si te interesa algo diferente, también tengo disponibilidad para el Tour de Las Canteras:\n\n${canLines}` : '';
+      const msg = baseMsg + canSection + '\n¿Te viene bien alguno? 😊';
+      window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+    });
+  });
 }
 
 function openCivitatisConfirm(name, url) {
@@ -1787,19 +1615,18 @@ function confirmDelete() {
 function markCancelled(b) {
   localStorage.setItem(cancelledKey(b), '1');
   localStorage.removeItem(bookingKey(b));
-  updateTasksBadge();
+
 }
 
 function confirmBooking(b) {
   localStorage.setItem(bookingKey(b), '1');
-  updateTasksBadge();
+
   render();
 }
 
 let _noPhoneIdx = null;
 
 let _waConfirmIdx = null;
-let _waConfirmFromTasks = false;
 
 function confirmViaWhatsApp(idx, fromTasks) {
   const b = bookings[idx];
@@ -1834,18 +1661,19 @@ function doWhatsAppConfirm(who) {
     const dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
     const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
     const dt = new Date(+y, +mo-1, +d);
-    const fechaMsg = `${dias[dt.getDay()]} ${+d} de ${meses[+mo-1]} a las ${timePart}`;
-    msg = `Buenos días, ${nombre} 👋 soy Cristina, guía de Cristitours 🙋🏻‍♀️\n\nTe escribo para decirte que, el ${tourNombre} para el que tienes reserva el ${fechaMsg} no podré realizarlo yo, me sustituirá mi compañera Aurora.\n\n¿Cuento igualmente con tu participación? 🤗`;
+    const fechaMsg = datePart === todayStr
+      ? `hoy a las ${timePart}`
+      : `el ${dias[dt.getDay()]} ${+d} de ${meses[+mo-1]} a las ${timePart}`;
+    const meetingPoint = b.tour === 'canteras'
+      ? `🕐 Hora: ${timePart}\n📍 Punto de encuentro: Monumento a Lolita Pluma, C. Luis Morote, 12, Las Palmas.\nhttps://maps.app.goo.gl/DLzYEFBuSEYAnUSi9`
+      : `🕐 Hora: ${timePart}\n📍 Punto de encuentro: Plaza Tenor Stagno, 1\nhttps://maps.app.goo.gl/NvTDdCd7T4w2sS716`;
+    msg = `Buenos días, ${nombre} 👋 soy Cristina, guía de Cristitours 🙋🏻‍♀️\n\nTe escribo para decirte que, el ${tourNombre} para el que tienes reserva ${fechaMsg} no podré realizarlo yo, me sustituirá mi compañera Aurora.\n\n${meetingPoint}\n\n¿Cuento igualmente con tu participación? 🤗`;
   } else {
     msg = buildMsg(b);
   }
   window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
   confirmBooking(b);
   document.getElementById('wa-sender-overlay').style.display = 'none';
-  if (_waConfirmFromTasks) {
-    updateTasksBadge();
-    renderTaskRows();
-  }
   _waConfirmIdx = null;
 }
 
@@ -1876,7 +1704,7 @@ function confirmViaEmail() {
 
 function unconfirmBooking(idx) {
   localStorage.removeItem(bookingKey(bookings[idx]));
-  updateTasksBadge();
+
   render();
 }
 
@@ -1887,17 +1715,19 @@ function buildMsg(b) {
   const dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
   const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const dt = new Date(+y, +mo-1, +d);
-  const fechaMsg = `${dias[dt.getDay()]} ${+d} de ${meses[+mo-1]} a las ${timePart}`;
+  const fechaMsg = datePart === todayStr
+    ? `hoy a las ${timePart}`
+    : `el ${dias[dt.getDay()]} ${+d} de ${meses[+mo-1]} a las ${timePart}`;
   if (b.tour === 'centro') {
-    return `¡Hola, ${nombre}! 😊\n\n¡Todo listo para el Free Tour por el Centro Histórico de Las Palmas! Te espero este ${fechaMsg}.\n\n📍 Punto de encuentro: Plaza Tenor Stagno, 1\nhttps://maps.app.goo.gl/NvTDdCd7T4w2sS716\n\n¡Nos vemos pronto! 🙌`;
+    return `¡Hola, ${nombre}! 😊\n\nTe escribo para confirmarte tu reserva del Free Tour por el Centro Histórico de Las Palmas ${fechaMsg}.\n\n📍 Punto de encuentro: Plaza Tenor Stagno, 1\nhttps://maps.app.goo.gl/NvTDdCd7T4w2sS716\n\n¿Confirmas tu asistencia? 🙏`;
   } else if (b.tour === 'portugues') {
     const dt2 = new Date(+y, +mo-1, +d);
     const diasPt  = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
     const mesesPt = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
     const fechaPt = `${diasPt[dt2.getDay()]}, ${+d} de ${mesesPt[+mo-1]}, às ${timePart}`;
-    return `Olá, ${nombre}! 😊\n\nTudo pronto para o Free Tour pelo Centro Histórico de Las Palmas! Espero por si nesta ${fechaPt}.\n\n📍 Ponto de encontro: Plaza Tenor Stagno, 1\nhttps://maps.app.goo.gl/NvTDdCd7T4w2sS716\n\nAté já! 🙌`;
+    return `Olá, ${nombre}! 😊\n\nEscrevo-te para confirmar a tua reserva do Free Tour pelo Centro Histórico de Las Palmas no dia ${fechaPt}.\n\n📍 Ponto de encontro: Plaza Tenor Stagno, 1\nhttps://maps.app.goo.gl/NvTDdCd7T4w2sS716\n\nConfirmas a tua presença? 🙏`;
   } else {
-    return `¡Hola, ${nombre}! 😊\n\n¡Todo listo para el Free Tour Playa de las Canteras! Te espero este ${fechaMsg}.\n\n📍 Punto de encuentro: Monumento a Lolita Pluma, C. Luis Morote, 12, Las Palmas.\nhttps://maps.app.goo.gl/DLzYEFBuSEYAnUSi9\n\n¡Nos vemos pronto! 🙌`;
+    return `¡Hola, ${nombre}! 😊\n\nTe escribo para confirmarte tu reserva del Free Tour Playa de las Canteras el ${fechaMsg}.\n\n📍 Punto de encuentro: Monumento a Lolita Pluma, C. Luis Morote, 12, Las Palmas.\nhttps://maps.app.goo.gl/DLzYEFBuSEYAnUSi9\n\n¿Confirmas tu asistencia? 🙏`;
   }
 }
 
@@ -1920,6 +1750,7 @@ function cardActions(b) {
   const svgWA = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`;
 
   const svgLink = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+  const svgClock = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`;
   const contactBtn = b.source === 'civitatis' && b.contactUrl
     ? `<button onclick="openCivitatisConfirm('${b.name.replace(/'/g,"\\'")}','${b.contactUrl}')" class="action-btn whatsapp confirm-btn" style="background:#dbeafe;color:#1a56db;border:none">${svgLink} Confirmar reserva</button>`
     : b.source === 'guruwalk' && !isPast
@@ -1933,6 +1764,7 @@ function cardActions(b) {
         : `<a href="tel:${phone}" class="action-btn call" title="Llamar">${svgCall}</a>
            <a href="https://wa.me/${phone}?text=${msg}" target="_blank" class="action-btn whatsapp confirm-btn" title="WhatsApp">${svgWA}</a>`
       }
+      ${b.source !== 'civitatis' ? `<button class="action-btn call" onclick="openTimePick(${idx})" title="Cambiar hora" style="background:#f0f9ff;color:#0369a1;border:none">${svgClock}</button>` : ''}
     </div>`;
   }
 
@@ -1959,6 +1791,7 @@ function cardActions(b) {
           </button>
          </div>`
     }
+    ${b.source !== 'civitatis' ? `<button class="action-btn call" onclick="openTimePick(${idx})" title="Cambiar hora" style="background:#f0f9ff;color:#0369a1;border:none">${svgClock}</button>` : ''}
     ${b.source === 'civitatis' && b.contactUrl
       ? `<button class="cancel-btn" onclick="openCivitatisCancel('${b.name.replace(/'/g,"\\'")}','${b.contactUrl}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Cancelar</button>`
       : b.source === 'guruwalk'
@@ -2222,10 +2055,420 @@ function applyAdsFilter() {
   if (from && to && from <= to) renderRendimientoPanel(from, to);
 };
 
+let estimacionVista = 'proximas';
+
+function setEstimacionVista(v) {
+  estimacionVista = v;
+  renderEstimacion();
+}
+
+function renderEstimacion() {
+  document.getElementById('today-banner').innerHTML = '';
+  document.getElementById('novedades').innerHTML = '';
+
+  const PRICE = 12;
+  const HIST_FROM = '2026-04';
+  const MESES_LARGO = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const MESES_CORTO = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const currentMonthKey = todayStr.slice(0, 7);
+
+  function getLunesStr(dateStr) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dt = new Date(y, m - 1, d);
+    const dow = dt.getDay();
+    dt.setDate(dt.getDate() + (dow === 0 ? -6 : 1 - dow));
+    return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+  }
+
+  function dateToStr(dt) {
+    return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+  }
+
+  // Toggle
+  const toggleHtml = `<div style="display:flex;gap:0;background:#f1f5f9;border-radius:10px;padding:3px;margin-bottom:1.25rem">
+    <button onclick="setEstimacionVista('proximas')" style="flex:1;padding:0.5rem 0.75rem;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;background:${estimacionVista==='proximas'?'white':'transparent'};color:${estimacionVista==='proximas'?'#1a56db':'#94a3b8'};box-shadow:${estimacionVista==='proximas'?'0 1px 4px rgba(0,0,0,0.1)':'none'}">📈 Próximas</button>
+    <button onclick="setEstimacionVista('historico')" style="flex:1;padding:0.5rem 0.75rem;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;background:${estimacionVista==='historico'?'white':'transparent'};color:${estimacionVista==='historico'?'#0d9488':'#94a3b8'};box-shadow:${estimacionVista==='historico'?'0 1px 4px rgba(0,0,0,0.1)':'none'}">📊 Histórico</button>
+  </div>`;
+
+  let html = `<div style="padding:1rem">${toggleHtml}`;
+
+  if (estimacionVista === 'proximas') {
+    // ── VISTA PRÓXIMAS ──
+    const futuras = bookings.filter(b => {
+      if (isDeleted(b) || isCancelled(b)) return false;
+      return b.start.slice(0, 10) >= todayStr;
+    });
+
+    // Índice por día para buscar rápido
+    const porDia = {};
+    futuras.forEach(b => {
+      const d = b.start.slice(0, 10);
+      if (!porDia[d]) porDia[d] = { personas: 0, reservas: 0 };
+      porDia[d].personas += (b.people || 1);
+      porDia[d].reservas++;
+    });
+
+    function countRange(from, to) {
+      let personas = 0, reservas = 0;
+      const [fy,fm,fd] = from.split('-').map(Number);
+      const [ty,tm,td] = to.split('-').map(Number);
+      const cur = new Date(fy, fm-1, fd);
+      const end = new Date(ty, tm-1, td);
+      while (cur <= end) {
+        const ds = dateToStr(cur);
+        if (porDia[ds]) { personas += porDia[ds].personas; reservas += porDia[ds].reservas; }
+        cur.setDate(cur.getDate() + 1);
+      }
+      return { personas, reservas };
+    }
+
+    // Generar meses y semanas clipadas al mes
+    const hoy = new Date();
+    const porMes = {};
+    for (let i = 0; i < 7; i++) {
+      const dt = new Date(hoy.getFullYear(), hoy.getMonth() + i, 1);
+      const y = dt.getFullYear(), m = dt.getMonth();
+      const mk = `${y}-${String(m+1).padStart(2,'0')}`;
+      const firstDayStr = `${y}-${String(m+1).padStart(2,'0')}-01`;
+      const lastDayNum  = new Date(y, m+1, 0).getDate();
+      const lastDayStr  = `${y}-${String(m+1).padStart(2,'0')}-${String(lastDayNum).padStart(2,'0')}`;
+
+      if (lastDayStr < todayStr) continue;
+
+      const semanas = [];
+      const firstDt = new Date(y, m, 1);
+      const fdow = firstDt.getDay();
+      const cur = new Date(firstDt);
+      cur.setDate(firstDt.getDate() - (fdow === 0 ? 6 : fdow - 1));
+
+      while (true) {
+        const wEnd = new Date(cur); wEnd.setDate(wEnd.getDate() + 6);
+        const wStartStr = dateToStr(cur);
+        const wEndStr   = dateToStr(wEnd);
+        if (wStartStr > lastDayStr) break;
+
+        const dispStart = wStartStr < firstDayStr ? firstDayStr : wStartStr;
+        const dispEnd   = wEndStr   > lastDayStr  ? lastDayStr  : wEndStr;
+
+        if (dispEnd >= todayStr) {
+          const countFrom = dispStart < todayStr ? todayStr : dispStart;
+          const { personas, reservas } = countRange(countFrom, dispEnd);
+          semanas.push({ dispStart: countFrom, dispEnd, personas, reservas });
+        }
+        cur.setDate(cur.getDate() + 7);
+      }
+
+      if (semanas.length > 0) porMes[mk] = { year: y, mes: m, semanas };
+    }
+
+    Object.keys(porMes).sort().forEach(key => {
+      const { year, mes, semanas: sw } = porMes[key];
+      const mesPersonas = sw.reduce((a, s) => a + s.personas, 0);
+      const mesIngresos = mesPersonas * PRICE;
+      const bgColor = mesPersonas > 0 ? 'linear-gradient(135deg,#1a56db,#1e40af)' : '#f1f5f9';
+      const txtColor = mesPersonas > 0 ? 'white' : '#cbd5e1';
+      const subColor = mesPersonas > 0 ? 'rgba(255,255,255,0.75)' : '#94a3b8';
+
+      html += `<div style="margin-bottom:1.25rem">
+        <div style="background:${bgColor};border-radius:14px;padding:1rem 1.25rem;margin-bottom:0.6rem;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${subColor};margin-bottom:0.25rem">${MESES_LARGO[mes]} ${year}</div>
+            <div style="font-size:1.5rem;font-weight:800;color:${txtColor};line-height:1">${mesPersonas > 0 ? mesIngresos.toLocaleString('es-ES') + ' €' : '—'}</div>
+          </div>
+          ${mesPersonas > 0 ? `<div style="text-align:right"><div style="font-size:1.75rem;font-weight:800;color:white;line-height:1">${mesPersonas}</div><div style="font-size:0.7rem;color:rgba(255,255,255,0.7);margin-top:0.2rem">personas</div></div>` : ''}
+        </div>
+        ${sw.map(s => {
+          const ingresos = s.personas * PRICE;
+          const hay = s.personas > 0;
+          const [,sm,sd] = s.dispStart.split('-');
+          const [,em,ed] = s.dispEnd.split('-');
+          return `<div style="background:white;border-radius:10px;padding:0.75rem 1rem;margin-bottom:0.4rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.05);border-left:3px solid ${hay ? '#1a56db' : '#e2e8f0'}">
+            <div>
+              <div style="font-size:0.83rem;font-weight:600;color:${hay ? '#1a202c' : '#94a3b8'}">${+sd} ${MESES_CORTO[+sm-1]} — ${+ed} ${MESES_CORTO[+em-1]}</div>
+              <div style="font-size:0.72rem;margin-top:0.15rem;color:${hay ? '#64748b' : '#cbd5e1'}">${hay ? `${s.reservas} reserva${s.reservas!==1?'s':''} · ${s.personas} persona${s.personas!==1?'s':''}` : 'Sin reservas aún'}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;margin-left:1rem">
+              ${hay ? `<div style="font-size:1rem;font-weight:800;color:#1d4ed8">${ingresos.toLocaleString('es-ES')} €</div><div style="font-size:0.65rem;color:#94a3b8">${s.personas} × ${PRICE} €</div>` : `<div style="font-size:0.875rem;font-weight:600;color:#e2e8f0">0 €</div>`}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    });
+
+  } else {
+    // ── VISTA HISTÓRICO ──
+    // Reservas desde abril (pasadas + mes actual completo)
+    const relevantes = bookings.filter(b => {
+      if (isDeleted(b) || isCancelled(b)) return false;
+      const mk = b.start.slice(0, 7);
+      return mk >= HIST_FROM && mk <= currentMonthKey;
+    });
+
+    // Agrupar por mes → semana (del lunes que pertenece al mes del tour, no al de la semana)
+    const porMes = {};
+    relevantes.forEach(b => {
+      const dateStr = b.start.slice(0, 10);
+      const mk = dateStr.slice(0, 7);
+      const [my, mm] = mk.split('-').map(Number);
+      const lunes = getLunesStr(dateStr);
+      const plat = b.source === 'civitatis' ? 'civitatis' : b.source === 'guruwalk' ? 'guruwalk' : 'web';
+
+      if (!porMes[mk]) porMes[mk] = {
+        year: my, mes: mm - 1,
+        semanas: {},
+        plataformas: { web: 0, civitatis: 0, guruwalk: 0 },
+        esMesActual: mk === currentMonthKey
+      };
+      porMes[mk].plataformas[plat] += (b.people || 1);
+      if (!porMes[mk].semanas[lunes]) porMes[mk].semanas[lunes] = { personas: 0, reservas: 0 };
+      porMes[mk].semanas[lunes].personas += (b.people || 1);
+      porMes[mk].semanas[lunes].reservas++;
+    });
+
+    if (Object.keys(porMes).length === 0) {
+      html += `<div style="text-align:center;padding:2rem;color:#94a3b8;font-size:0.875rem">Sin datos desde abril</div>`;
+    } else {
+      Object.keys(porMes).sort().reverse().forEach(mk => {
+        const { year, mes, semanas, plataformas, esMesActual } = porMes[mk];
+        const mesPersonas = Object.values(plataformas).reduce((a, v) => a + v, 0);
+        const mesIngresos = mesPersonas * PRICE;
+
+        // Colores del mes
+        const bgColor = esMesActual
+          ? (mesPersonas > 0 ? 'linear-gradient(135deg,#7c3aed,#5b21b6)' : '#f1f5f9')
+          : (mesPersonas > 0 ? 'linear-gradient(135deg,#0d9488,#0f766e)' : '#f1f5f9');
+        const accentBorder = esMesActual ? '#7c3aed' : '#0d9488';
+        const accentMoney  = esMesActual ? '#7c3aed' : '#0f766e';
+
+        // Desglose por plataforma
+        const plats = [
+          { key: 'web',       label: 'WEB' },
+          { key: 'civitatis', label: 'Civitatis' },
+          { key: 'guruwalk',  label: 'Guruwalk' }
+        ].filter(p => plataformas[p.key] > 0);
+
+        const platHtml = plats.length > 1 ? `
+          <div style="border-top:1px solid rgba(255,255,255,0.15);margin-top:0.75rem;padding-top:0.65rem;display:flex;flex-direction:column;gap:0.35rem">
+            ${plats.map(p => {
+              const pct = Math.round(plataformas[p.key] / mesPersonas * 100);
+              const pEur = plataformas[p.key] * PRICE;
+              return `<div style="display:flex;align-items:center;gap:0.5rem">
+                <span style="font-size:0.6rem;font-weight:700;background:rgba(255,255,255,0.18);color:white;padding:0.1rem 0.4rem;border-radius:4px;min-width:58px;text-align:center;flex-shrink:0">${p.label}</span>
+                <div style="flex:1;background:rgba(255,255,255,0.15);border-radius:99px;height:3px">
+                  <div style="width:${pct}%;background:white;opacity:0.85;border-radius:99px;height:100%"></div>
+                </div>
+                <span style="font-size:0.68rem;color:rgba(255,255,255,0.85);font-weight:700;min-width:30px;text-align:right">${pct}%</span>
+                <span style="font-size:0.68rem;color:rgba(255,255,255,0.65);min-width:42px;text-align:right">${pEur.toLocaleString('es-ES')} €</span>
+              </div>`;
+            }).join('')}
+          </div>` : '';
+
+        // Semanas (clipeadas al mes)
+        const firstDayStr = `${year}-${String(mes+1).padStart(2,'0')}-01`;
+        const lastDayNum  = new Date(year, mes + 1, 0).getDate();
+        const lastDayStr  = `${year}-${String(mes+1).padStart(2,'0')}-${String(lastDayNum).padStart(2,'0')}`;
+
+        const semanasOrdenadas = Object.keys(semanas).sort();
+        const semanasHtml = semanasOrdenadas.map(lunes => {
+          const { personas, reservas } = semanas[lunes];
+          const displayStart = lunes < firstDayStr ? firstDayStr : lunes;
+          const lunesDt = new Date(...lunes.split('-').map((v,i) => i===1 ? +v-1 : +v));
+          lunesDt.setDate(lunesDt.getDate() + 6);
+          const sundayStr   = dateToStr(lunesDt);
+          const displayEnd  = sundayStr > lastDayStr ? lastDayStr : sundayStr;
+          const [,dsm,dsd]  = displayStart.split('-');
+          const [,dem,ded]  = displayEnd.split('-');
+          const label = `${+dsd} ${MESES_CORTO[+dsm-1]} — ${+ded} ${MESES_CORTO[+dem-1]}`;
+          const ingresos = personas * PRICE;
+          return `<div style="background:white;border-radius:10px;padding:0.75rem 1rem;margin-bottom:0.4rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.05);border-left:3px solid ${accentBorder}">
+            <div>
+              <div style="font-size:0.83rem;font-weight:600;color:#1a202c">${label}</div>
+              <div style="font-size:0.72rem;margin-top:0.15rem;color:#64748b">${reservas} reserva${reservas!==1?'s':''} · ${personas} persona${personas!==1?'s':''}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;margin-left:1rem">
+              <div style="font-size:1rem;font-weight:800;color:${accentMoney}">${ingresos.toLocaleString('es-ES')} €</div>
+              <div style="font-size:0.65rem;color:#94a3b8">${personas} × ${PRICE} €</div>
+            </div>
+          </div>`;
+        }).join('');
+
+        html += `<div style="margin-bottom:1.25rem">
+          <div style="background:${bgColor};border-radius:14px;padding:1rem 1.25rem;margin-bottom:0.6rem">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.2rem">
+                  <span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${mesPersonas>0?'rgba(255,255,255,0.75)':'#94a3b8'}">${MESES_LARGO[mes]} ${year}</span>
+                  ${esMesActual ? `<span style="font-size:0.6rem;font-weight:700;background:rgba(255,255,255,0.2);color:white;padding:0.1rem 0.45rem;border-radius:99px">EN CURSO</span>` : ''}
+                </div>
+                <div style="font-size:1.5rem;font-weight:800;color:${mesPersonas>0?'white':'#cbd5e1'};line-height:1">${mesPersonas>0?mesIngresos.toLocaleString('es-ES')+' €':'—'}</div>
+              </div>
+              ${mesPersonas>0?`<div style="text-align:right"><div style="font-size:1.75rem;font-weight:800;color:white;line-height:1">${mesPersonas}</div><div style="font-size:0.7rem;color:rgba(255,255,255,0.7);margin-top:0.2rem">personas</div></div>`:''}
+            </div>
+            ${platHtml}
+          </div>
+          ${semanasHtml}
+        </div>`;
+      });
+    }
+  }
+
+  html += `</div>`;
+  document.getElementById('app').innerHTML = html;
+}
+
+function renderTours() {
+  document.getElementById('today-banner').innerHTML = '';
+
+  const upcoming = bookings.filter(b =>
+    !isDeleted(b) && !isCancelled(b) && b.start.slice(0, 10) >= todayStr
+  );
+
+  const byDate = {};
+  upcoming.forEach(b => {
+    const d = b.start.slice(0, 10);
+    if (!byDate[d]) byDate[d] = [];
+    byDate[d].push(b);
+  });
+
+  const dates = Object.keys(byDate).sort();
+
+  if (dates.length === 0) {
+    document.getElementById('app').innerHTML = '<div class="empty">Sin tours próximos</div>';
+    return;
+  }
+
+  const DAYS   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+  const TOUR_GROUPS = [
+    { label: 'Free Tour Las Palmas',   tours: ['centro','portugues'], gradient: 'linear-gradient(135deg,#1a56db,#1e40af)', chipBg: 'rgba(255,255,255,0.2)' },
+    { label: 'Free Tour Las Canteras', tours: ['canteras'],           gradient: 'linear-gradient(135deg,#059669,#047857)', chipBg: 'rgba(255,255,255,0.2)' },
+  ];
+
+  let html = '';
+
+  dates.forEach(dateStr => {
+    const dayBookings = byDate[dateStr];
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dt = new Date(y, m - 1, d);
+    const isToday = dateStr === todayStr;
+    const weekday = isToday ? 'HOY' : DAYS[dt.getDay()].toUpperCase();
+    const dateLabel = `${d} de ${MONTHS[m - 1]}`;
+
+    html += `<div style="margin-bottom:2rem">
+      <div style="padding:0.6rem 1rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.6rem;background:${isToday ? 'linear-gradient(90deg,#eff6ff,transparent)' : 'linear-gradient(90deg,#f8fafc,transparent)'};border-left:3px solid ${isToday ? '#1a56db' : '#cbd5e1'}">
+        <span style="font-size:1rem;font-weight:900;letter-spacing:1px;color:${isToday ? '#1a56db' : '#334155'}">${weekday}</span>
+        <span style="font-size:0.95rem;font-weight:600;color:${isToday ? '#1e40af' : '#64748b'}">${dateLabel}</span>
+      </div>`;
+
+    // Una tarjeta por cada combinación tour × hora
+    const slots = [];
+    TOUR_GROUPS.forEach(group => {
+      const gb = dayBookings.filter(b => group.tours.includes(b.tour));
+      const hours = [...new Set(gb.map(b => b.start.slice(11, 16)).filter(Boolean))].sort();
+      hours.forEach(hour => {
+        const members = gb.filter(b => b.start.slice(11, 16) === hour);
+        if (members.length) slots.push({ group, hour, members });
+      });
+    });
+    slots.sort((a, b) => a.hour.localeCompare(b.hour));
+
+    slots.forEach(({ group, hour, members: gb }) => {
+      const totalPeople   = gb.reduce((s, b) => s + (b.people || 1), 0);
+      const totalReservas = gb.length;
+      const timeStr = hour;
+
+      const statusGradient = totalPeople === 1
+        ? 'linear-gradient(135deg,#dc2626,#b91c1c)'
+        : totalPeople <= 3
+          ? 'linear-gradient(135deg,#ea580c,#c2410c)'
+          : 'linear-gradient(135deg,#059669,#047857)';
+      const statusEmoji = totalPeople === 1 ? '😬' : totalPeople <= 3 ? '🤞' : '🎉';
+      const statusLabel = totalPeople === 1 ? 'Complicado' : totalPeople <= 3 ? 'Ahí ahí' : '¡Perfecto!';
+
+      // SVG icons (reutilizados de cardActions)
+      const svgCall = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+      const svgWA   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`;
+      const svgCheck = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+      const svgX     = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+      const svgClk   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`;
+      const btnBase  = 'flex-shrink:0;width:30px;height:30px;border-radius:8px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;';
+
+      // Lista de personas
+      let peopleRows = '';
+      gb.forEach((b, i) => {
+        const idx  = bookings.indexOf(b);
+        const phone = b.phone ? b.phone.replace(/\s+/g, '') : '';
+        const confirmed = isConfirmed(b);
+        const msg = phone ? encodeURIComponent(buildMsg(b)) : '';
+
+        const callBtn = phone
+          ? `<a href="tel:${phone}" style="${btnBase}background:#f1f5f9;color:#475569" title="Llamar">${svgCall}</a>`
+          : `<span style="${btnBase}background:#f8fafc;color:#cbd5e1;pointer-events:none">${svgCall}</span>`;
+
+        const waBtn = phone && b.source !== 'civitatis'
+          ? `<button onclick="confirmViaWhatsApp(${idx})" style="${btnBase}background:#dcfce7;color:#15803d" title="Confirmar por WhatsApp">${svgWA}</button>`
+          : '';
+
+        const confirmBtn = confirmed
+          ? `<button onclick="unconfirmBooking(${idx})" style="${btnBase}background:#dcfce7;color:#15803d" title="Confirmada — toca para revertir">${svgCheck}</button>`
+          : `<button onclick="openManualConfirm(${idx})" style="${btnBase}background:#f0fdf4;color:#15803d" title="Confirmar manual">${svgCheck}</button>`;
+
+        const cancelBtn = b.source === 'civitatis' && b.contactUrl
+          ? `<button onclick="openCivitatisCancel('${b.name.replace(/'/g,"\\'")}','${b.contactUrl}')" style="${btnBase}background:#fff1f2;color:#e11d48" title="Cancelar">${svgX}</button>`
+          : b.source === 'guruwalk'
+          ? `<button onclick="openGuruWalkCancelPopup(${idx})" style="${btnBase}background:#fff1f2;color:#e11d48" title="Cancelar">${svgX}</button>`
+          : `<button onclick="openCancelPopup(${idx})" style="${btnBase}background:#fff1f2;color:#e11d48" title="Cancelar">${svgX}</button>`;
+
+        const hasContact = b.phone || b.email;
+        peopleRows += `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.75rem;padding:0.625rem 1.25rem;${i > 0 ? 'border-top:1px solid #f1f5f9' : ''}">
+          <div style="min-width:0;flex:1">
+            <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+              <span style="font-size:0.9rem;font-weight:700;color:#1a202c">${b.name}</span>
+              ${sourceBadge(b)}
+              ${confirmed ? `<span style="font-size:0.62rem;font-weight:700;background:#dcfce7;color:#15803d;padding:0.1rem 0.4rem;border-radius:4px">✓ Confirmada</span>` : ''}
+            </div>
+            ${b.phone ? `<div style="font-size:0.78rem;color:#475569;margin-top:0.1rem">${b.phone}</div>` : ''}
+            ${b.email ? `<div style="font-size:0.75rem;color:#94a3b8;margin-top:0.05rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer" title="${b.email}" onclick="this.style.whiteSpace=this.style.whiteSpace==='normal'?'nowrap':'normal';this.style.overflow=this.style.overflow==='visible'?'hidden':'visible'">${b.email}</div>` : ''}
+            ${!hasContact ? `<div style="font-size:0.75rem;color:#cbd5e1;margin-top:0.1rem">Sin contacto</div>` : ''}
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;flex-shrink:0">
+            <div style="background:#f1f5f9;border-radius:8px;padding:0.2rem 0.5rem;text-align:center">
+              <span style="font-size:0.95rem;font-weight:800;color:#1a202c">${b.people}</span>
+              <span style="font-size:0.6rem;color:#64748b"> pers.</span>
+            </div>
+            <div style="display:flex;gap:0.25rem">${callBtn}${waBtn}${confirmBtn}${b.source !== 'civitatis' ? `<button onclick="openTimePick(${idx})" style="${btnBase}background:#e0f2fe;color:#0369a1" title="Cambiar hora">${svgClk}</button>` : ''}${cancelBtn}</div>
+          </div>
+        </div>`;
+      });
+
+      html += `<div style="margin:0 1rem 0.75rem;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.10)">
+        <div style="background:${statusGradient};padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem">
+          <div>
+            <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.7);margin-bottom:0.2rem">${timeStr || '—'}</div>
+            <div style="font-size:1rem;font-weight:800;color:white;line-height:1.2">${group.label}</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.7);margin-top:0.25rem">${totalReservas} reserva${totalReservas !== 1 ? 's' : ''}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:2.75rem;font-weight:900;color:white;line-height:1">${totalPeople}</div>
+            <div style="font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.9);margin-top:0.1rem">${statusEmoji} ${statusLabel}</div>
+          </div>
+        </div>
+        <div style="background:white">${peopleRows}</div>
+      </div>`;
+    });
+
+    html += '</div>';
+  });
+
+  document.getElementById('app').innerHTML = html;
+}
+
 function render() {
-  if (currentFilter === 'calendar') { renderCalendar(); return; }
+  if (currentFilter === 'tours')     { renderTours();    return; }
   if (currentFilter === 'opiniones') { renderOpiniones(); return; }
   if (currentFilter === 'rendimiento') { renderRendimiento(); return; }
+  if (currentFilter === 'estimacion') { renderEstimacion(); return; }
 
   const app = document.getElementById('app');
   const banner = document.getElementById('today-banner');
@@ -2317,7 +2560,7 @@ function render() {
           <div class="card-date">${iconCalendar()} ${formatDate(b.start)}</div>
           <div class="card-meta">
             <span class="meta-item">${b.phone}</span>
-            <span class="meta-item">${b.email}</span>
+            ${b.email ? `<span class="meta-item" style="max-width:160px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:block" title="${b.email}" onclick="this.style.whiteSpace=this.style.whiteSpace==='normal'?'nowrap':'normal';this.style.overflow=this.style.overflow==='visible'?'hidden':'visible'">${b.email}</span>` : ''}
           </div>
           <div class="card-footer" style="flex-wrap:wrap;gap:0.5rem">
             <div class="people-badge">${iconPeople()} ${b.people} persona${b.people > 1 ? 's' : ''}</div>
@@ -2851,290 +3094,629 @@ function closeCancelPopupDirect() {
   setTimeout(() => { overlay.style.display = 'none'; }, 150);
 }
 
+// ── SINCRONIZACIÓN REMOTA ────────────────────────────────────
+const SYNC_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzL8YAkNml2YMPMEfu0AB8G1d4fgKbyWV1rhuI07fSMJRvRP1RlVhaR4vijDQNdcqln/exec';
+const SYNC_PREFIXES = ['confirmed_', 'cancelled_', 'deleted_', 'dismissed_nov_', 'time_override_', 'ct_review_'];
+
+let _syncPaused = false;
+
+(function() {
+  const _lsSet    = localStorage.setItem.bind(localStorage);
+  const _lsRemove = localStorage.removeItem.bind(localStorage);
+  localStorage.setItem = function(key, value) {
+    _lsSet(key, value);
+    if (!_syncPaused && SYNC_PREFIXES.some(p => key.startsWith(p))) _remoteSet(key, value);
+  };
+  localStorage.removeItem = function(key) {
+    _lsRemove(key);
+    if (!_syncPaused && SYNC_PREFIXES.some(p => key.startsWith(p))) _remoteDel(key);
+  };
+})();
+
+function _remoteSet(key, value) {
+  if (!SYNC_ENDPOINT) return;
+  const fn = '_rSet' + Date.now();
+  window[fn] = function() { delete window[fn]; };
+  const s = document.createElement('script');
+  s.src = SYNC_ENDPOINT + '?action=save&key=' + encodeURIComponent(key) + '&value=' + encodeURIComponent(value) + '&callback=' + fn;
+  document.head.appendChild(s);
+}
+
+function _remoteDel(key) {
+  if (!SYNC_ENDPOINT) return;
+  const fn = '_rDel' + Date.now();
+  window[fn] = function() { delete window[fn]; };
+  const s = document.createElement('script');
+  s.src = SYNC_ENDPOINT + '?action=delete&key=' + encodeURIComponent(key) + '&callback=' + fn;
+  document.head.appendChild(s);
+}
+
+function loadRemoteState(callback) {
+  if (!SYNC_ENDPOINT) { callback(); return; }
+  const fn = '_rLoad' + Date.now();
+  window[fn] = function(data) {
+    if (data && data.overrides) {
+      _syncPaused = true;
+      Object.entries(data.overrides).forEach(([k, v]) => {
+        if (v && v.start) {
+          localStorage.setItem(k, JSON.stringify({ start: String(v.start), tour: String(v.tour || '') }));
+        } else if (v && v.value) {
+          localStorage.setItem(k, String(v.value));
+        }
+      });
+      _syncPaused = false;
+    }
+    delete window[fn];
+    callback();
+  };
+  const s = document.createElement('script');
+  s.onerror = function() { delete window[fn]; callback(); };
+  s.src = SYNC_ENDPOINT + '?action=get&callback=' + fn;
+  document.head.appendChild(s);
+}
+
+// ── CAMBIAR HORA ─────────────────────────────────────────────
+function timeOverrideKey(b) { return 'time_override_' + bookingKey(b); }
+
+function getTimeOverride(b) {
+  try { return JSON.parse(localStorage.getItem(timeOverrideKey(b))); } catch(e) { return null; }
+}
+
+function applyTimeOverrides() {
+  bookings.forEach(b => {
+    if (b._origStart === undefined) { b._origStart = b.start; b._origTour = b.tour; }
+    b.start = b._origStart;
+    b.tour  = b._origTour;
+    const seen = new Set();
+    while (true) {
+      const key = timeOverrideKey(b);
+      if (seen.has(key)) break;
+      seen.add(key);
+      const ov = getTimeOverride(b);
+      if (!ov || !ov.start) break;
+      b.start = ov.start;
+      if (ov.tour) b.tour = ov.tour;
+    }
+  });
+}
+
+function _syncSnapshot() {
+  return Object.keys(localStorage)
+    .filter(k => SYNC_PREFIXES.some(p => k.startsWith(p)))
+    .sort().map(k => k + '=' + localStorage.getItem(k)).join('|');
+}
+
+function forceSyncNow(btn) {
+  if (btn) { btn.style.color = '#f59e0b'; btn.textContent = '⟳'; }
+  const snapshot = _syncSnapshot();
+  loadRemoteState(function() {
+    const current = _syncSnapshot();
+    const changed = snapshot !== current;
+    if (changed) { applyTimeOverrides(); render(); }
+    if (btn) { btn.style.color = changed ? '#22c55e' : '#94a3b8'; btn.textContent = '⟳'; setTimeout(() => { btn.style.color = '#94a3b8'; }, 2000); }
+    _showSyncToast(changed);
+  });
+}
+
+function _showSyncToast(changed) {
+  let t = document.getElementById('_sync-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_sync-toast';
+    t.style.cssText = 'position:fixed;top:1rem;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:0.5rem 1rem;border-radius:8px;font-size:0.8rem;font-weight:600;z-index:9999;transition:opacity 0.3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = changed ? '✓ Cambio detectado y aplicado' : 'Sin cambios nuevos';
+  t.style.background = changed ? '#15803d' : '#1e293b';
+  t.style.opacity = '1';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
+function startRemotePolling() {
+  setInterval(function() {
+    const snapshot = _syncSnapshot();
+    loadRemoteState(function() {
+      const current = _syncSnapshot();
+      if (snapshot !== current) { applyTimeOverrides(); render(); }
+    });
+  }, 10000);
+}
+
+let _timePickIdx = null;
+let _selectedSlots = new Set();
+
+// --- Elfsight schedule ---
+let _elfSettings = null;
+let _elfError = false;
+let _elfErrMsg = '';
+let _elfCanterasSettings = null;
+
+function _elfFetch(url, widgetId, onOk, onFail) {
+  fetch(url)
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(json => {
+      const w = json && json.data && json.data.widgets && json.data.widgets[widgetId];
+      if (!w) throw new Error('widget not found in response');
+      onOk(w.data.settings);
+    })
+    .catch(e => {
+      // Retry once via corsproxy.io in case of CORS block
+      fetch('https://corsproxy.io/?url=' + encodeURIComponent(url))
+        .then(r => r.json())
+        .then(json => {
+          const w = json && json.data && json.data.widgets && json.data.widgets[widgetId];
+          if (!w) throw new Error('widget not found via proxy');
+          onOk(w.data.settings);
+        })
+        .catch(e2 => onFail(e.message + ' / proxy: ' + e2.message));
+    });
+}
+
+function loadElfsightSchedule(cb) {
+  if (_elfSettings !== null) { cb(_elfSettings); return; }
+  const id = 'bd9e782d-7aa6-4649-8306-97562f8e0fea';
+  _elfFetch('https://core.service.elfsight.com/p/boot/?w=' + id + '&page=https://' + id.replace(/-/g,'') + '.elf.site', id,
+    s => { _elfSettings = s; _elfError = false; cb(s); },
+    msg => { _elfErrMsg = msg; _elfError = true; cb({}); });
+}
+
+function loadElfsightCanterasSchedule(cb) {
+  if (_elfCanterasSettings !== null) { cb(_elfCanterasSettings); return; }
+  const id = 'c5eb17d4-4278-4b3f-94b0-c06aa179418c';
+  _elfFetch('https://core.service.elfsight.com/p/boot/?w=' + id + '&page=https://' + id.replace(/-/g,'') + '.elf.site', id,
+    s => { _elfCanterasSettings = s; cb(s); },
+    () => { cb({}); });
+}
+function getElfsightSlotsForDate(settings, dateStr) {
+  if (!settings) return [];
+  const d = new Date(dateStr + 'T00:00:00');
+  const dayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()];
+  const special = (settings.specialIntervals || []).find(si =>
+    si.startDate && si.endDate && dateStr >= si.startDate.date && dateStr <= si.endDate.date
+  );
+  if (special) {
+    if (special.type === 'dayOff' || special.type === 'closed') return [];
+    return (special.workingHours || []).map(h => h.timeRange[0]).sort();
+  }
+  if (!settings[`day${dayName}Open`]) return [];
+  return (settings[`day${dayName}Hours`] || []).map(h => h.timeRange[0]).sort();
+}
+
+const _svgWAtp = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`;
+const _svgPhone = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>`;
+
+function openTimePick(idx, prefillDate, prefillHour) {
+  const b = bookings[idx];
+  _timePickIdx = idx;
+  const isOTA = b.source === 'civitatis' || b.source === 'guruwalk';
+  const platName = b.source === 'civitatis' ? 'Civitatis' : 'Guruwalk';
+  const currentTime = prefillHour || b.start.slice(11, 16) || '';
+  const currentDate = prefillDate || b.start.slice(0, 10);
+  const initTour = b.tour === 'portugues' ? 'centro' : (b.tour || 'centro');
+
+  const warningHtml = isOTA ? `
+    <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:0.75rem 1rem;margin-bottom:1rem;display:flex;gap:0.6rem;align-items:flex-start">
+      <span style="font-size:1.1rem;flex-shrink:0">⚠️</span>
+      <div style="font-size:0.8rem;color:#9a3412;line-height:1.5">
+        <strong>Este horario se gestiona desde ${platName}.</strong><br>
+        Cambiar aquí solo lo modifica en esta app, no en la plataforma.
+      </div>
+    </div>` : '';
+
+  const hasPhone = !!(b.phone);
+  const manualOpen = (prefillDate || prefillHour) ? 'true' : 'false';
+
+  document.getElementById('timepick-content').innerHTML = `
+    <div style="font-size:1rem;font-weight:700;color:#1a202c;margin-bottom:0.2rem">Cambiar horario</div>
+    <div style="font-size:0.8rem;color:#64748b;margin-bottom:1rem">${b.name}</div>
+    ${warningHtml}
+    <div id="timepick-slots" style="margin-bottom:0.75rem"></div>
+    <div style="margin-bottom:1rem;background:#f8fafc;border-radius:12px;padding:0.75rem">
+      <div style="font-size:0.7rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem">Añadir fecha manual</div>
+      <div style="display:flex;gap:0.35rem;align-items:center">
+        <input type="date" id="tp-manual-date" style="flex:2;padding:0.4rem 0.45rem;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.8rem;color:#1a202c;min-width:0">
+        <input type="time" id="tp-manual-time" style="flex:1;padding:0.4rem 0.35rem;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.8rem;color:#1a202c;min-width:0">
+        <select id="tp-manual-tour" style="flex:1;padding:0.4rem 0.35rem;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.8rem;color:#1a202c;min-width:0">
+          <option value="centro">LPA</option>
+          <option value="canteras">Can.</option>
+        </select>
+        <button onclick="timepickAddManual()" style="padding:0.4rem 0.65rem;border:none;border-radius:8px;background:#1d4ed8;color:white;font-size:0.9rem;font-weight:700;cursor:pointer;flex-shrink:0">+</button>
+      </div>
+      <div id="tp-manual-list" style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem"></div>
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-bottom:1rem">
+      <button id="timepick-propose-btn" onclick="timepickProposeWA(this)"
+        style="flex:1;padding:0.65rem 0.5rem;border:none;border-radius:10px;background:#f0fdf4;color:#15803d;font-size:0.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.35rem;opacity:0.35;pointer-events:none">
+        ${_svgWAtp} WhatsApp
+      </button>
+      <button id="timepick-call-btn" onclick="timepickAskGuide('call')"
+        style="flex:1;padding:0.65rem 0.5rem;border:none;border-radius:10px;background:#eff6ff;color:#1d4ed8;font-size:0.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.35rem;opacity:${hasPhone?'0.35':'0.2'};pointer-events:${hasPhone?'none':'none'}">
+        ${_svgPhone} Llamar
+      </button>
+    </div>
+    <div id="timepick-guide-picker" style="display:none;margin-bottom:1rem;background:#f8fafc;border-radius:12px;padding:0.75rem">
+      <div style="font-size:0.78rem;font-weight:600;color:#64748b;margin-bottom:0.5rem;text-align:center">¿Quién hace el tour?</div>
+      <div style="display:flex;gap:0.5rem">
+        <button onclick="timepickOnGuideClick(event,'cristina')" style="flex:1;padding:0.6rem;border:none;border-radius:8px;background:#dbeafe;color:#1d4ed8;font-size:0.82rem;font-weight:700;cursor:pointer">Yo (Cristina)</button>
+        <button onclick="timepickOnGuideClick(event,'aurora')" style="flex:1;padding:0.6rem;border:none;border-radius:8px;background:#fce7f3;color:#9d174d;font-size:0.82rem;font-weight:700;cursor:pointer">Aurora</button>
+      </div>
+    </div>
+    <button onclick="closeTimePick()" style="width:100%;padding:0.7rem;border:1.5px solid #e2e8f0;border-radius:10px;background:white;color:#94a3b8;font-size:0.85rem;font-weight:600;cursor:pointer">Cerrar</button>`;
+
+  document.getElementById('timepick-overlay').style.display = 'flex';
+  document.getElementById('timepick-sheet').dataset.tour = initTour;
+  const _tpTmr = new Date(); _tpTmr.setDate(_tpTmr.getDate() + 1);
+  const _tpFmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const manualDateEl = document.getElementById('tp-manual-date');
+  if (manualDateEl) manualDateEl.value = _tpFmt(_tpTmr);
+  renderTimepickSlots();
+}
+
+function renderTimepickSlots() {
+  const container = document.getElementById('timepick-slots');
+  if (!container) return;
+  container.innerHTML = `<div style="font-size:0.75rem;color:#94a3b8">Cargando horarios...</div>`;
+  _selectedSlots = new Set();
+
+  const editingB = bookings[_timePickIdx];
+  const existing = {};
+  bookings.forEach(b => {
+    if (b === editingB || isDeleted(b) || isCancelled(b)) return;
+    const ds = b.start.slice(0, 10);
+    const hr = b.start.slice(11, 16);
+    const tg = b.tour === 'canteras' ? 'canteras' : 'centro';
+    existing[ds + '|' + hr + '|' + tg] = (existing[ds + '|' + hr + '|' + tg] || 0) + (b.people || 1);
+  });
+
+  let centroS = null, cantS = null;
+  function onBothLoaded() {
+    if (centroS === null || cantS === null) return;
+    if (!document.getElementById('timepick-slots')) return;
+    const now = new Date();
+    const today = new Date(); today.setHours(0,0,0,0);
+    const _lds = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const todayDs = _lds(today);
+    const tomorrowDs = _lds(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1));
+    const nowHHMM = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    const diasC = ['dom','lun','mar','mié','jue','vie','sáb'];
+
+    // Start from the booking's date (or today if it's already passed)
+    const editingB = bookings[_timePickIdx];
+    const bookingDs = editingB ? editingB.start.slice(0, 10) : todayDs;
+    const bookingDate = new Date(bookingDs + 'T00:00:00');
+    const startDate = bookingDate > today ? bookingDate : today;
+
+    function slotBtn(dateStr, hour, tour) {
+      const isCan = tour === 'canteras';
+      const key = dateStr + '|' + hour + '|' + tour;
+      const people = existing[key] || 0;
+      const badge = people > 0 ? `<span style="background:rgba(0,0,0,0.08);border-radius:99px;padding:0.05rem 0.3rem;font-size:0.65rem;margin-left:0.2rem">${people} pers.</span>` : '';
+      const btnId = 'slot-' + dateStr + '-' + hour.replace(':', '') + '-' + tour;
+      return `<button id="${btnId}" onclick="timepickToggleSlot('${dateStr}','${hour}','${tour}')"
+        style="padding:0.4rem 0.7rem;border-radius:99px;border:1.5px solid #cbd5e1;background:#f8fafc;color:#475569;font-size:0.82rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center">
+        ${hour}${badge}</button>`;
+    }
+
+    // Collect slots per tour starting from the booking's date
+    const centroSlots = [], cantSlots = [];
+    for (let i = 0; i < 21; i++) {
+      const date = new Date(startDate);
+      date.setDate(date.getDate() + i);
+      const ds = _lds(date);
+      const isToday = ds === todayDs;
+      const fc = isToday ? getElfsightSlotsForDate(centroS, ds).filter(h => h > nowHHMM) : getElfsightSlotsForDate(centroS, ds);
+      const fk = isToday ? getElfsightSlotsForDate(cantS, ds).filter(h => h > nowHHMM) : getElfsightSlotsForDate(cantS, ds);
+      if (fc.length && centroSlots.length < 3) centroSlots.push({ date, ds, hours: fc });
+      if (fk.length && cantSlots.length < 3) cantSlots.push({ date, ds, hours: fk });
+      if (centroSlots.length >= 3 && cantSlots.length >= 3) break;
+    }
+
+    function dayLabel(entry) {
+      const ds = entry.ds, date = entry.date;
+      if (ds === todayDs)    return 'Hoy';
+      if (ds === tomorrowDs) return 'Mañana';
+      return `${diasC[date.getDay()].charAt(0).toUpperCase() + diasC[date.getDay()].slice(1)} ${date.getDate()}`;
+    }
+    function tourSection(slots, tour, color, title) {
+      if (!slots.length) return '';
+      let s = `<div style="margin-bottom:1rem">
+        <div style="font-size:0.72rem;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem">${title}</div>`;
+      slots.forEach(entry => {
+        s += `<div style="margin-bottom:0.5rem">
+          <div style="font-size:0.7rem;color:#64748b;margin-bottom:0.25rem">${dayLabel(entry)} <span style="color:#94a3b8">· ${entry.date.getDate()} ${meses[entry.date.getMonth()]}</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.35rem">`;
+        entry.hours.forEach(h => { s += slotBtn(entry.ds, h, tour); });
+        s += `</div></div>`;
+      });
+      s += `</div>`;
+      return s;
+    }
+
+    // Slots BEFORE the booking date (from today up to booking day, excluding booking's own slot)
+    const bookingSlot = editingB ? editingB.start.slice(0, 10) + '|' + editingB.start.slice(11, 16) : null;
+    const prevCentroSlots = [], prevCantSlots = [];
+    if (bookingDate > today) {
+      for (let i = 1; i <= 5; i++) {
+        const date = new Date(bookingDate);
+        date.setDate(date.getDate() - i);
+        const ds = _lds(date);
+        if (ds < todayDs) break;
+        const isToday = ds === todayDs;
+        const fc = getElfsightSlotsForDate(centroS, ds)
+          .filter(h => (!isToday || h > nowHHMM) && (ds + '|' + h) !== bookingSlot);
+        const fk = getElfsightSlotsForDate(cantS, ds)
+          .filter(h => (!isToday || h > nowHHMM) && (ds + '|' + h) !== bookingSlot);
+        if (fc.length) prevCentroSlots.push({ date, ds, hours: fc });
+        if (fk.length) prevCantSlots.push({ date, ds, hours: fk });
+      }
+    }
+
+    function slotBtnPrev(dateStr, hour, tour) {
+      const isCan = tour === 'canteras';
+      const key = dateStr + '|' + hour + '|' + tour;
+      const btnId = 'slot-' + dateStr + '-' + hour.replace(':', '') + '-' + tour;
+      return `<button id="${btnId}" onclick="timepickToggleSlot('${dateStr}','${hour}','${tour}')"
+        style="padding:0.4rem 0.7rem;border-radius:99px;border:1.5px solid #e2e8f0;background:#f1f5f9;color:#64748b;font-size:0.82rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center">
+        ${hour}</button>`;
+    }
+    function tourSectionPrev(slots, tour, color, title) {
+      if (!slots.length) return '';
+      let s = `<div style="margin-bottom:0.75rem">
+        <div style="font-size:0.68rem;font-weight:700;color:${color};opacity:0.7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem">${title}</div>`;
+      slots.forEach(entry => {
+        s += `<div style="margin-bottom:0.4rem">
+          <div style="font-size:0.68rem;color:#94a3b8;margin-bottom:0.2rem">${dayLabel(entry)} · ${entry.date.getDate()} ${meses[entry.date.getMonth()]}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.3rem">`;
+        entry.hours.forEach(h => { s += slotBtnPrev(entry.ds, h, tour); });
+        s += `</div></div>`;
+      });
+      s += `</div>`;
+      return s;
+    }
+
+    let html = `<div style="font-size:0.7rem;font-weight:700;color:#475569;margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.5px">Toca para seleccionar y proponer</div>`;
+    html += tourSection(centroSlots, 'centro', '#1d4ed8', 'Las Palmas — Centro Histórico');
+    html += tourSection(cantSlots, 'canteras', '#15803d', 'Las Canteras');
+
+    if (!centroSlots.length && !cantSlots.length) {
+      html += _elfError
+        ? `<div style="font-size:0.78rem;color:#e11d48;background:#fff1f2;border-radius:8px;padding:0.6rem 0.75rem">No se pudo cargar el horario. Comprueba la conexión o recarga la app.<br><span style="font-size:0.68rem;color:#94a3b8;display:block;margin-top:0.3rem">${_elfErrMsg}</span></div>`
+        : `<div style="font-size:0.78rem;color:#94a3b8">No hay tours programados en Elfsight para los próximos días.</div>`;
+    }
+
+    if (prevCentroSlots.length || prevCantSlots.length) {
+      const prevId = 'tp-prev-' + Date.now();
+      html += `<details style="margin-top:0.5rem;margin-bottom:0.25rem">
+        <summary style="font-size:0.75rem;font-weight:600;color:#94a3b8;cursor:pointer;list-style:none;display:flex;align-items:center;gap:0.3rem;user-select:none">
+          <span id="${prevId}-arrow">▸</span> También antes del tour
+        </summary>
+        <div style="margin-top:0.6rem;padding:0.65rem 0.75rem;background:#f8fafc;border-radius:10px">`;
+      html += tourSectionPrev(prevCentroSlots, 'centro', '#1d4ed8', 'Las Palmas — Centro Histórico');
+      html += tourSectionPrev(prevCantSlots, 'canteras', '#15803d', 'Las Canteras');
+      html += `</div></details>`;
+    }
+
+    container.innerHTML = html;
+  }
+
+  loadElfsightSchedule(function(s) { centroS = s; onBothLoaded(); });
+  loadElfsightCanterasSchedule(function(s) { cantS = s; onBothLoaded(); });
+}
+
+function timepickToggleSlot(dateStr, hour, tour) {
+  const key = dateStr + '|' + hour + '|' + (tour || 'centro');
+  const btnId = 'slot-' + dateStr + '-' + hour.replace(':', '') + '-' + (tour || 'centro');
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  const isCan = (tour === 'canteras');
+  const selColor = isCan ? '#15803d' : '#1d4ed8';
+  const selBg   = isCan ? '#dcfce7' : '#dbeafe';
+  if (_selectedSlots.has(key)) {
+    _selectedSlots.delete(key);
+    btn.style.borderColor = '#cbd5e1';
+    btn.style.background = '#f8fafc';
+    btn.style.color = '#475569';
+  } else {
+    _selectedSlots.add(key);
+    btn.style.borderColor = selColor;
+    btn.style.background = selBg;
+    btn.style.color = selColor;
+  }
+  const has = _selectedSlots.size > 0;
+  const proposeBtn = document.getElementById('timepick-propose-btn');
+  if (proposeBtn) { proposeBtn.style.opacity = has ? '1' : '0.35'; proposeBtn.style.pointerEvents = has ? 'auto' : 'none'; }
+  const callBtn = document.getElementById('timepick-call-btn');
+  if (callBtn && bookings[_timePickIdx]?.phone) { callBtn.style.opacity = has ? '1' : '0.35'; callBtn.style.pointerEvents = has ? 'auto' : 'none'; }
+}
+
+let _timepickGuideAction = null;
+
+function buildTimepickChangeUrl() {
+  if (!_selectedSlots.size || _timePickIdx === null) return null;
+  const b = bookings[_timePickIdx];
+  const phone = b && b.phone ? b.phone.replace(/\s+/g, '') : '';
+  if (!phone) return null;
+  const nombre = b.name.split(' ')[0];
+  const [datePart] = b.start.split('T');
+  const overrideKey = timeOverrideKey(b);
+  const slotsParam  = [..._selectedSlots].sort().join(',');
+  return location.origin + location.pathname.replace('index.html','') + 'cambio.html'
+    + '?n=' + encodeURIComponent(nombre)
+    + '&o=' + encodeURIComponent(datePart)
+    + '&k=' + encodeURIComponent(overrideKey)
+    + '&s=' + encodeURIComponent(slotsParam)
+    + '&w=' + encodeURIComponent(phone);
+}
+
+function buildTimepickWAUrl(who, changeUrl) {
+  if (!_selectedSlots.size || _timePickIdx === null) return null;
+  const b = bookings[_timePickIdx];
+  const phone = b && b.phone ? b.phone.replace(/\s+/g, '') : '';
+  if (!phone) return null;
+  const nombre = b.name.split(' ')[0];
+  const dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const [datePart] = b.start.split('T');
+  const [y, mo, dd] = datePart.split('-');
+  const dt = new Date(+y, +mo-1, +dd);
+  const fechaOrig = datePart === todayStr ? 'hoy' : `${dias[dt.getDay()]} ${+dd} de ${meses[+mo-1]}`;
+  const slotLines = [..._selectedSlots].sort().map(s => {
+    const [ds, hr] = s.split('|');
+    const [sy, sm, sd] = ds.split('-');
+    const d = new Date(+sy, +sm-1, +sd);
+    return `· ${dias[d.getDay()]} ${+sd} de ${meses[+sm-1]} a las ${hr}`;
+  }).join('\n');
+  const intro = who === 'aurora'
+    ? `Hola, ${nombre} 👋 Soy Cristina de Cristitours. Este tour lo hará mi compañera Aurora.`
+    : `Hola, ${nombre} 👋 Soy Cristina de Cristitours.`;
+  const msg = `${intro}\n\nTe escribo sobre tu reserva del Free Tour de ${fechaOrig}. Necesito proponerte un cambio de horario.\n\nTe propongo estas opciones:\n${slotLines}\n\nConfirma o elige otro hueco aquí:\n👉 ${changeUrl}\n\nSi ninguna opción te viene bien, respóndeme y lo solucionamos 😊`;
+  return 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
+}
+
+function timepickProposeWA(btn) {
+  const url = buildTimepickChangeUrl();
+  if (!url) return;
+  const waUrl = buildTimepickWAUrl('cristina', url);
+  if (waUrl) { window.open(waUrl, '_blank'); closeTimePick(); }
+}
+
+function timepickAddManual() {
+  const ds  = (document.getElementById('tp-manual-date') || {}).value;
+  const hr  = (document.getElementById('tp-manual-time') || {}).value;
+  const tr  = (document.getElementById('tp-manual-tour') || {}).value || 'centro';
+  if (!ds || !hr) return;
+  const key = ds + '|' + hr + '|' + tr;
+  if (_selectedSlots.has(key)) return;
+  _selectedSlots.add(key);
+  const list = document.getElementById('tp-manual-list');
+  if (list) {
+    const d = new Date(ds + 'T00:00:00');
+    const DI = ['dom','lun','mar','mié','jue','vie','sáb'];
+    const ME = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    const label = `${DI[d.getDay()]} ${d.getDate()} ${ME[d.getMonth()]} ${hr}`;
+    const isCan = tr === 'canteras';
+    const chip = document.createElement('div');
+    chip.id = 'tp-chip-' + key.replace(/[^a-z0-9]/gi,'_');
+    chip.style.cssText = `display:inline-flex;align-items:center;gap:0.3rem;background:${isCan?'#dcfce7':'#dbeafe'};color:${isCan?'#15803d':'#1d4ed8'};border-radius:99px;padding:0.25rem 0.6rem;font-size:0.75rem;font-weight:700`;
+    chip.innerHTML = `${label} <span onclick="timepickRemoveManual('${key.replace(/'/g,"\\'")}')" style="cursor:pointer;opacity:0.55;line-height:1">✕</span>`;
+    list.appendChild(chip);
+  }
+  const has = _selectedSlots.size > 0;
+  const pb = document.getElementById('timepick-propose-btn');
+  if (pb) { pb.style.opacity = has ? '1' : '0.35'; pb.style.pointerEvents = has ? 'auto' : 'none'; }
+}
+
+function timepickRemoveManual(key) {
+  _selectedSlots.delete(key);
+  const chip = document.getElementById('tp-chip-' + key.replace(/[^a-z0-9]/gi,'_'));
+  if (chip) chip.remove();
+  const has = _selectedSlots.size > 0;
+  const pb = document.getElementById('timepick-propose-btn');
+  if (pb) { pb.style.opacity = has ? '1' : '0.35'; pb.style.pointerEvents = has ? 'auto' : 'none'; }
+}
+
+function timepickAskGuide(action) {
+  _timepickGuideAction = action;
+  const picker = document.getElementById('timepick-guide-picker');
+  if (!picker) return;
+  picker.style.display = 'block';
+}
+
+function timepickOnGuideClick(e, who) {
+  const b = bookings[_timePickIdx];
+  const phone = b && b.phone ? b.phone.replace(/\s+/g, '') : '';
+  if (phone) window.open('tel:' + phone, '_blank');
+  if (b && _selectedSlots.size) {
+    setPendingChange(b, [..._selectedSlots].sort());
+    setTimeout(checkPendingCalls, 800);
+  }
+  const picker = document.getElementById('timepick-guide-picker');
+  if (picker) picker.style.display = 'none';
+  closeTimePick();
+}
+
+function timepickSetTour(t) {
+  document.getElementById('timepick-sheet').dataset.tour = t;
+  const isCentro = t === 'centro';
+  document.getElementById('tp-btn-centro').style.borderColor   = isCentro  ? '#1d4ed8' : '#e2e8f0';
+  document.getElementById('tp-btn-centro').style.background    = isCentro  ? '#dbeafe' : 'white';
+  document.getElementById('tp-btn-centro').style.color         = isCentro  ? '#1d4ed8' : '#64748b';
+  document.getElementById('tp-btn-canteras').style.borderColor = !isCentro ? '#15803d' : '#e2e8f0';
+  document.getElementById('tp-btn-canteras').style.background  = !isCentro ? '#dcfce7' : 'white';
+  document.getElementById('tp-btn-canteras').style.color       = !isCentro ? '#15803d' : '#64748b';
+}
+
+function _remoteSetTimeOverride(key, start, tour) {
+  if (!SYNC_ENDPOINT) return;
+  const fn = '_rOv' + Date.now();
+  window[fn] = function() { delete window[fn]; };
+  const s = document.createElement('script');
+  s.onerror = function() { delete window[fn]; };
+  s.src = SYNC_ENDPOINT + '?action=save&key=' + encodeURIComponent(key)
+        + '&start=' + encodeURIComponent(start)
+        + '&tour='  + encodeURIComponent(tour)
+        + '&callback=' + fn;
+  document.head.appendChild(s);
+}
+
+function saveTimePick(date, hour) {
+  const idx  = _timePickIdx;
+  const b    = bookings[idx];
+  const tour = (document.getElementById('timepick-sheet') && document.getElementById('timepick-sheet').dataset.tour) || b.tour;
+  if (!date || !hour) return;
+  const newStart = date + 'T' + hour;
+  const k = timeOverrideKey(b);
+  _syncPaused = true;
+  localStorage.setItem(k, JSON.stringify({ start: newStart, tour }));
+  _syncPaused = false;
+  _remoteSetTimeOverride(k, newStart, tour);
+  b.start = newStart;
+  b.tour  = tour;
+  render();
+  closeTimePick();
+}
+
+function closeTimePick(e) {
+  if (e && e.target !== document.getElementById('timepick-overlay')) return;
+  document.getElementById('timepick-overlay').style.display = 'none';
+  _timePickIdx = null;
+}
+
 // --- TASKS ---
 function reviewKey(b) { return 'ct_review_' + bookingKey(b); }
 function isReviewRequested(b) { const v = localStorage.getItem(reviewKey(b)); return v && v !== '0' ? v : null; }
 function markReviewRequested(b, method) { localStorage.setItem(reviewKey(b), method || 'manual'); }
 
-function getPendingTasks() {
-  const toConfirm = bookings.filter(b =>
-    !isDeleted(b) && !isCancelled(b) && !isConfirmed(b) && getStatus(b.start) !== 'past'
-  );
-  const toReview = bookings.filter(b =>
-    !isDeleted(b) && !isCancelled(b) && !isReviewRequested(b) && getStatus(b.start) === 'past'
-  );
-  return { toConfirm, toReview };
-}
+const REVIEW_URL = 'https://g.page/r/Cb4LHaNCVqszEBM/review';
 
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.textContent = msg;
-  t.style.cssText = 'position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1a202c;color:white;padding:0.6rem 1.2rem;border-radius:99px;font-size:0.85rem;font-weight:600;z-index:9999;opacity:1;transition:opacity 0.4s';
-  document.body.appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 2000);
-}
-
-function updateTasksBadge() {
-  const { toConfirm, toReview } = getPendingTasks();
-  const total = toConfirm.length + toReview.length;
-
-  // Badge del header
-  const badge = document.getElementById('tasks-badge');
-  const btn   = document.getElementById('tasks-header-btn');
-  if (badge) {
-    if (total > 0) {
-      badge.style.display = 'flex';
-      badge.textContent = total;
-      badge.style.animation = 'badgePop 0.4s ease';
-      if (btn) btn.style.animation = 'taskPulse 2s ease-in-out infinite';
-    } else {
-      badge.style.display = 'none';
-      if (btn) btn.style.animation = '';
-    }
-  }
-
-  // Banner de urgencia bajo el header
-  const bar = document.getElementById('tasks-urgency-bar');
-  if (!bar) return;
-  if (total === 0) { bar.style.display = 'none'; return; }
-
-  const parts = [];
-  if (toConfirm.length) parts.push(`<strong>${toConfirm.length}</strong> sin confirmar`);
-  if (toReview.length)  parts.push(`<strong>${toReview.length}</strong> reseña${toReview.length > 1 ? 's' : ''} por pedir`);
-
-  bar.style.display = 'block';
-  bar.innerHTML = `
-    <div style="background:linear-gradient(90deg,#be123c,#e11d48);padding:0.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:0.75rem;box-shadow:0 2px 8px rgba(225,29,72,0.35)">
-      <div style="display:flex;align-items:center;gap:0.7rem">
-        <div style="background:rgba(255,255,255,0.2);border-radius:99px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:taskPulse 1.5s ease-in-out infinite">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        </div>
-        <div>
-          <div style="font-size:0.85rem;font-weight:800;color:white;letter-spacing:0.01em">⚡ ${total} tarea${total > 1 ? 's' : ''} pendiente${total > 1 ? 's' : ''}</div>
-          <div style="font-size:0.73rem;color:rgba(255,255,255,0.85);margin-top:1px">${parts.join(' · ')}</div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:0.3rem;background:rgba(255,255,255,0.2);color:white;font-size:0.8rem;font-weight:700;flex-shrink:0;padding:0.35rem 0.75rem;border-radius:8px">
-        Resolver
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </div>`;
-}
-
-function fmtDate(start) {
-  const [dp, tp] = start.split('T');
-  const [y, m, d] = dp.split('-');
-  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  return (+d) + ' ' + meses[+m-1] + ' · ' + tp;
-}
-
-function openTasksPanel() {
-  const { toConfirm, toReview } = getPendingTasks();
-  const overlay = document.getElementById('tasks-overlay');
-  const content = document.getElementById('tasks-content');
-
-  // fmtDate is defined globally below
-
-  const confirmRows = toConfirm.map(b => {
-    const idx = bookings.indexOf(b);
-    const phone = b.phone.replace(/\s+/g, '');
-    const tour = tourLabel(b.tour);
-    const srcColor = b.source === 'civitatis' ? '#2563eb' : b.source === 'guruwalk' ? '#e05252' : '#94a3b8';
-    const srcLabel = b.source === 'civitatis' ? 'Civitatis' : b.source === 'guruwalk' ? 'Guruwalk' : 'Web';
-    const svgWAicon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`;
-    const svgLink = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
-    const btnStyle = 'flex:1;display:flex;align-items:center;justify-content:center;gap:0.35rem;border:none;border-radius:10px;padding:0.55rem 0.75rem;font-size:0.82rem;font-weight:700;cursor:pointer;text-decoration:none';
-    const safeName = b.name.replace(/'/g,"\\'");
-    const svgManual = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-    const svgX = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
-    const btnManual = `<button onclick="openManualConfirm(${idx})" style="display:flex;align-items:center;gap:0.25rem;background:#f1f5f9;color:#475569;border:none;border-radius:10px;padding:0.55rem 0.65rem;font-size:0.78rem;font-weight:600;cursor:pointer;white-space:nowrap">${svgManual} Manual</button>`;
-    const cancelOnclick = b.source === 'civitatis' && b.contactUrl
-      ? `openCivitatisCancel('${safeName}','${b.contactUrl}')`
-      : b.source === 'guruwalk'
-      ? `openGuruWalkCancelPopup(${idx})`
-      : `closeTasksPanelDirect();openCancelPopup(${idx})`;
-    const btnCancel = `<button onclick="${cancelOnclick}" style="display:flex;align-items:center;justify-content:center;background:#fff1f2;color:#e11d48;border:none;border-radius:10px;padding:0.55rem 0.6rem;font-size:0.78rem;cursor:pointer" title="Cancelar">${svgX}</button>`;
-
-    let btnsHtml;
-    if (b.source === 'civitatis' && b.contactUrl) {
-      btnsHtml = `
-        <button onclick="openCivitatisConfirm('${safeName}','${b.contactUrl}')" style="${btnStyle};background:#1a56db;color:white">${svgLink} Confirmar reserva</button>
-        ${btnManual}${btnCancel}`;
-    } else if (b.source === 'guruwalk') {
-      btnsHtml = `
-        <button onclick="confirmViaWhatsApp(${idx},true)" style="${btnStyle};background:#15803d;color:white">${svgWAicon} Confirmar por WA</button>
-        ${btnManual}${btnCancel}`;
-    } else {
-      btnsHtml = `
-        <button onclick="confirmViaWhatsApp(${idx},true)" style="${btnStyle};background:#15803d;color:white">${svgWAicon} Confirmar por WA</button>
-        ${btnManual}${btnCancel}`;
-    }
-    return `
-    <div style="border:1px solid #e2e8f0;border-left:3px solid ${srcColor};border-radius:12px;padding:0.75rem;margin-bottom:0.5rem;background:white">
-      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.2rem">
-        <span style="font-weight:700;font-size:0.95rem;color:#0f172a">${b.name}</span>
-        <span style="font-size:0.68rem;font-weight:600;color:${srcColor}">${srcLabel}</span>
-      </div>
-      <div style="font-size:0.78rem;color:#64748b;margin-bottom:0.05rem">${tour} · ${fmtDate(b.start)}</div>
-      <div style="font-size:0.72rem;color:#94a3b8;margin-bottom:0.65rem">${b.phone}${b.email ? ' · ' + b.email : ''}</div>
-      <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap">
-        ${btnsHtml}
-      </div>
-    </div>`;
-  }).join('');
-
-  const reviewRows = toReview.map(b => {
-    const idx = bookings.indexOf(b);
-    const phone = b.phone.replace(/\s+/g, '');
-    const tour = tourFullName(b.tour);
-    const srcColor = b.source === 'civitatis' ? '#2563eb' : b.source === 'guruwalk' ? '#e05252' : '#94a3b8';
-    const srcLabel = b.source === 'civitatis' ? 'Civitatis' : b.source === 'guruwalk' ? 'Guruwalk' : 'Web';
-    const svgWAicon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`;
-    const showWA = b.source !== 'civitatis' && phone;
-    const showMail = b.source === 'web' && b.email;
-    return `
-    <div style="border:1px solid #e2e8f0;border-left:3px solid ${srcColor};border-radius:12px;padding:0.75rem;margin-bottom:0.5rem;background:white">
-      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.2rem">
-        <span style="font-weight:700;font-size:0.95rem;color:#0f172a">${b.name}</span>
-        <span style="font-size:0.68rem;font-weight:600;color:${srcColor}">${srcLabel}</span>
-      </div>
-      <div style="font-size:0.78rem;color:#64748b;margin-bottom:0.65rem">${tourLabel(b.tour)} · ${fmtDate(b.start)}</div>
-      <div style="display:flex;gap:0.4rem;flex-wrap:wrap">
-        ${showWA ? `<a href="#" onclick="event.preventDefault();sendReviewWA(${idx},'${phone}','${tour.replace(/'/g,"\\'")}');return false" style="display:flex;align-items:center;gap:0.3rem;background:#15803d;color:white;border-radius:10px;padding:0.5rem 0.75rem;font-size:0.8rem;font-weight:700;text-decoration:none">${svgWAicon} Pedir por WA</a>` : ''}
-        ${showMail ? `<a href="#" onclick="event.preventDefault();sendReviewEmail(${idx});return false" style="display:flex;align-items:center;gap:0.3rem;background:#1a56db;color:white;border-radius:10px;padding:0.5rem 0.75rem;font-size:0.8rem;font-weight:700;text-decoration:none">✉️ Por mail</a>` : ''}
-        <button onclick="markReviewRequested(bookings[${idx}],'manual');updateTasksBadge();renderTaskRows()" style="display:flex;align-items:center;gap:0.25rem;background:#f1f5f9;color:#475569;border:none;border-radius:10px;padding:0.5rem 0.65rem;font-size:0.78rem;font-weight:600;cursor:pointer">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Manual
-        </button>
-      </div>
-    </div>`;
-  }).join('');
-
-  const total = toConfirm.length + toReview.length;
-
-  content.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-      <div class="cancel-popup-title" style="margin:0">Tareas pendientes ${total > 0 ? `<span style="background:#e11d48;color:white;font-size:0.65rem;font-weight:700;border-radius:99px;padding:0.1rem 0.45rem;margin-left:0.35rem;vertical-align:middle">${total}</span>` : ''}</div>
-      <button onclick="closeTasksPanelDirect()" style="background:none;border:none;color:#94a3b8;font-size:1.2rem;cursor:pointer;padding:0;line-height:1">✕</button>
-    </div>
-
-    ${toConfirm.length > 0 ? `
-    <div style="margin-bottom:1.25rem">
-      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:2px solid #f1f5f9">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        <span style="font-size:1rem;font-weight:800;color:#0f172a">Confirmar reservas</span>
-        <span style="background:#dcfce7;color:#15803d;font-size:0.72rem;font-weight:700;border-radius:99px;padding:0.1rem 0.55rem">${toConfirm.length}</span>
-      </div>
-      <div id="confirm-rows">${confirmRows}</div>
-    </div>` : ''}
-
-    ${toReview.length > 0 ? `
-    <div style="margin-bottom:1.25rem">
-      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:2px solid #f1f5f9">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <span style="font-size:1rem;font-weight:800;color:#0f172a">Pedir reseñas</span>
-        <span style="background:#dbeafe;color:#1a56db;font-size:0.72rem;font-weight:700;border-radius:99px;padding:0.1rem 0.55rem">${toReview.length}</span>
-      </div>
-      <div id="review-rows">${reviewRows}</div>
-    </div>` : ''}
-
-    ${total === 0 ? `
-    <div style="text-align:center;padding:2rem 0;color:#94a3b8">
-      <div style="font-size:2rem;margin-bottom:0.5rem">✅</div>
-      <div style="font-weight:600;font-size:0.9rem">Todo al día</div>
-      <div style="font-size:0.8rem;margin-top:0.25rem">No hay tareas pendientes</div>
-    </div>` : ''}
-
-    <button class="cancel-dismiss" onclick="closeTasksPanelDirect()">Cerrar</button>
-  `;
-
-  overlay.style.display = 'flex';
-  overlay.classList.remove('closing');
-}
-
-function sendReviewWA(idx, phone, tour) {
-  // Emojis como bytes UTF-8 ya codificados — método más fiable cross-browser
-  var WAVE  = '%F0%9F%91%8B'; // 👋
-  var POINT = '%F0%9F%91%89'; // 👉
-  var HUG   = '%F0%9F%A4%97'; // 🤗
-  var HEART = '%E2%9D%A4%EF%B8%8F'; // ❤️
-  var NL    = '%0A';
-
-  // Mensaje según antigüedad del tour
-  var b = bookings[idx];
-  var tourDate = new Date(b.start.split('T')[0]);
-  var diasPasados = Math.floor((new Date() - tourDate) / (1000 * 60 * 60 * 24));
-  var reciente = diasPasados <= 3;
-
-  var intro = reciente
-    ? encodeURIComponent('Ha sido un placer tenerte en el ' + tour + '. Si te gust\u00f3 la experiencia, tanto como a mi. Ay\u00fadame dejando una rese\u00f1a. Solo te llevar\u00e1 un minuto.')
-    : encodeURIComponent('Fue un placer tenerte en el ' + tour + '. Espero que lo disfrutaras tanto como yo. Si tienes un momento, me har\u00edas un gran favor dej\u00e1ndome una rese\u00f1a en Google.');
-
-  var url = 'https://wa.me/' + phone.replace(/\s+/g,'') + '?text='
-    + '%C2%A1Hola!' + '%20' + WAVE + NL + NL
-    + intro
-    + NL + NL
-    + POINT + '%20' + encodeURIComponent('https://g.page/r/Cb4LHaNCVqszEBM/review')
-    + NL + NL
-    + '%C2%A1Mil%20gracias%20por%20el%20apoyo!' + '%20' + HUG + HEART;
-
-  var a = document.createElement('a');
-  a.href = url;
-  a.target = '_blank';
-  a.rel = 'noopener';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  markReviewRequested(bookings[idx], 'wa');
-  updateTasksBadge();
-  renderTaskRows();
+function sendReviewWA(idx, phone, tourName) {
+  const b = bookings[idx];
+  const nombre = toTitleCase(b.name.trim().split(/\s+/)[0]);
+  const msg = `¡Hola, ${nombre}! 🙋🏻‍♀️ Soy Cristina de Cristitours. Espero que disfrutaras del ${tourName} 😊\n\n¿Te importaría dejarnos una reseña en Google? Nos ayuda muchísimo a llegar a más viajeros ✨\n\n👉 ${REVIEW_URL}\n\n¡Muchas gracias! 🙏`;
+  window.open('https://wa.me/' + phone.replace(/\D/g,'') + '?text=' + encodeURIComponent(msg), '_blank');
+  markReviewRequested(b, 'wa');
+  renderOpiniones();
 }
 
 function sendReviewEmail(idx) {
   const b = bookings[idx];
-  const tour = tourFullName(b.tour);
-  const url = CANCEL_SCRIPT_URL
-    + '?action=survey'
-    + '&email=' + encodeURIComponent(b.email)
-    + '&name='  + encodeURIComponent(b.name)
-    + '&tour='  + encodeURIComponent(tour);
-
-  const img = new Image();
-  img.onload = img.onerror = () => {
-    markReviewRequested(b, 'mail');
-    if (currentFilter === 'opiniones') {
-      showToast('✅ Correo enviado a ' + b.name.split(' ')[0]);
-      renderOpiniones();
-    } else {
-      const content = document.getElementById('tasks-content');
-      content.innerHTML = `<div style="text-align:center;padding:2rem 0">
-        <div style="font-size:2.5rem">✅</div>
-        <div style="font-weight:700;margin-top:0.5rem;color:#1a202c">Correo enviado</div>
-        <div style="color:#64748b;font-size:0.82rem;margin-top:0.25rem">Encuesta enviada a ${b.name}</div>
-      </div>`;
-      setTimeout(() => { updateTasksBadge(); renderTaskRows(); }, 1500);
-    }
-  };
-  img.src = url;
+  const nombre = toTitleCase(b.name.trim().split(/\s+/)[0]);
+  const tourName = tourFullName(b.tour);
+  const subject = encodeURIComponent('¿Qué te pareció el tour? ⭐ Cristitours');
+  const body = encodeURIComponent(`¡Hola, ${nombre}!\n\nEspero que hayas disfrutado del ${tourName} 😊\n\nSi te gustó la experiencia, me ayudarías muchísimo dejando una reseña en Google:\n\n👉 ${REVIEW_URL}\n\n¡Solo son unos segundos y significa mucho para mí! 🙏\n\nHasta pronto,\nCristina — Cristitours`);
+  window.open('mailto:' + b.email + '?subject=' + subject + '&body=' + body, '_blank');
+  markReviewRequested(b, 'mail');
+  renderOpiniones();
 }
 
-function renderTaskRows() {
-  // Re-abre el panel para refrescar
-  openTasksPanel();
-}
-
-function closeTasksPanel(e) {
-  const overlay = document.getElementById('tasks-overlay');
-  if (e && e.target !== overlay) return;
-  overlay.classList.add('closing');
-  setTimeout(() => { overlay.style.display = 'none'; }, 150);
-}
-
-function closeTasksPanelDirect() {
-  const overlay = document.getElementById('tasks-overlay');
-  overlay.classList.add('closing');
-  setTimeout(() => { overlay.style.display = 'none'; }, 150);
-}
-
+function getPendingTasks() { return { toConfirm: [], toReview: [] }; }
+function updateTasksBadge() {}
+function openTasksPanel() {}
+function closeTasksPanel() {}
+function closeTasksPanelDirect() {}
+function renderTaskRows() {}
 // --- OPINIONES ---
 let opinionesTab = 'pendientes'; // 'pendientes' | 'pedidas'
 
@@ -3188,7 +3770,7 @@ function renderOpiniones() {
              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
              WA
            </a>` : ''}
-           ${b.source === 'web' && b.email ? `<a href="#" onclick="event.preventDefault();sendReviewEmail(${idx});return false" style="background:#eff6ff;color:#1a56db;border-radius:8px;padding:0.35rem 0.65rem;font-size:0.78rem;font-weight:600;text-decoration:none">✉️ Mail</a>` : ''}
+           ${b.source !== 'civitatis' && b.email ? `<a href="#" onclick="event.preventDefault();sendReviewEmail(${idx});return false" style="background:#eff6ff;color:#1a56db;border-radius:8px;padding:0.35rem 0.65rem;font-size:0.78rem;font-weight:600;text-decoration:none">✉️ Mail</a>` : ''}
            <button onclick="markReviewRequested(bookings[${idx}],'manual');renderOpiniones()" style="background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;padding:0.35rem 0.5rem;font-size:0.78rem;cursor:pointer" title="Marcar como hecho">✓</button>
          </div>`;
 
@@ -3205,7 +3787,7 @@ function renderOpiniones() {
         <div class="card-date">${iconCalendar()} ${formatDate(b.start)}</div>
         <div class="card-meta">
           <span class="meta-item">${b.phone}</span>
-          <span class="meta-item">${b.email}</span>
+          ${b.email ? `<span class="meta-item" style="max-width:160px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:block" title="${b.email}" onclick="this.style.whiteSpace=this.style.whiteSpace==='normal'?'nowrap':'normal';this.style.overflow=this.style.overflow==='visible'?'hidden':'visible'">${b.email}</span>` : ''}
         </div>
         <div class="card-footer" style="flex-wrap:wrap;gap:0.5rem">
           <div class="people-badge">${iconPeople()} ${b.people} persona${b.people > 1 ? 's' : ''}</div>
@@ -3269,6 +3851,8 @@ function renderOpiniones() {
 
 // --- DEMO ---
 function loadDemo() {
+  window._demoMode = true;
+  sessionStorage.setItem('_demoMode', '1');
   const today = new Date();
   const fmt = (d) => d.toISOString().slice(0,10);
   const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
@@ -3301,18 +3885,19 @@ function loadDemo() {
   bookings.sort((a, b) => a.start.localeCompare(b.start));
   document.getElementById('demo-banner').style.display = 'block';
   document.getElementById('footer-text').textContent = 'Modo demo — datos de ejemplo';
-  updateStats();
-  render();
+  try { updateStats(); } catch(e) { console.error('demo updateStats:', e); }
+  try { render(); } catch(e) {
+    console.error('demo render:', e);
+    document.getElementById('app').innerHTML = '<div style="padding:1rem;color:red">Error en demo: ' + e.message + '</div>';
+  }
 }
 
 function exitDemo() {
+  window._demoMode = false;
+  sessionStorage.removeItem('_demoMode');
   document.getElementById('demo-banner').style.display = 'none';
   loadAll();
 }
-
-// --- AUTH ---
-const AUTH_KEY = 'cristitours_auth';
-const PIN = '1234';
 
 // --- Loading screen logic ---
 const SVG_CHECK = `<svg class="ld-check" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5 8.5 6.5 12.5 13.5 3.5"/></svg>`;
@@ -3333,18 +3918,19 @@ function dismissLoadingScreen() {
   screen.style.transition = 'opacity 0.35s';
   screen.style.opacity = '0';
   setTimeout(() => { screen.style.display = 'none'; screen.style.opacity = '1'; }, 350);
-  if (sessionStorage.getItem(AUTH_KEY) === '1') {
-    render();
-    setInterval(loadAll, 2 * 60 * 1000);
-  } else {
-    document.getElementById('auth-screen').style.display = 'flex';
-  }
+  if (sessionStorage.getItem('_demoMode')) { loadDemo(); } else { render(); }
+  setTimeout(checkPendingCalls, 400);
+  setInterval(loadAll, 2 * 60 * 1000);
 }
 
 // Called when OTA finishes (success or error)
 function onDataReady() {
   onOTALoaded();
-  dismissLoadingScreen();
+  loadRemoteState(function() {
+    applyTimeOverrides();
+    dismissLoadingScreen();
+    startRemotePolling();
+  });
 }
 
 function startLoadingScreen() {
@@ -3353,43 +3939,9 @@ function startLoadingScreen() {
   setTimeout(dismissLoadingScreen, 6000);
 }
 
-function authInput(digit) {
-  const dots = document.querySelectorAll('.pin-dot');
-  const display = document.getElementById('pin-display');
-  let current = display.dataset.value || '';
-  if (current.length >= 4) return;
-  current += digit;
-  display.dataset.value = current;
-  dots.forEach((d, i) => d.classList.toggle('filled', i < current.length));
-
-  if (current.length === 4) {
-    if (current === PIN) {
-      sessionStorage.setItem(AUTH_KEY, '1');
-      document.getElementById('auth-screen').style.display = 'none';
-      render();
-      setInterval(loadAll, 2 * 60 * 1000);
-    } else {
-      setTimeout(() => {
-        display.dataset.value = '';
-        dots.forEach(d => d.classList.remove('filled'));
-        document.getElementById('pin-error').style.opacity = '1';
-        setTimeout(() => { document.getElementById('pin-error').style.opacity = '0'; }, 1500);
-      }, 200);
-    }
-  }
-}
-
-function authDelete() {
-  const display = document.getElementById('pin-display');
-  const dots = document.querySelectorAll('.pin-dot');
-  let current = display.dataset.value || '';
-  if (!current.length) return;
-  current = current.slice(0, -1);
-  display.dataset.value = current;
-  dots.forEach((d, i) => d.classList.toggle('filled', i < current.length));
-}
 
 startLoadingScreen();
+
 </script>
 
 </body>
